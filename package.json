@@ -5,6 +5,12 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@commitlint/cli": "^17.5.0",
+    "@commitlint/config-conventional": "^17.4.4",
+    "husky": "^8.0.3",
     "lerna": "^6.6.1"
+  },
+  "scripts": {
+    "prepare": "husky install"
   }
 }
