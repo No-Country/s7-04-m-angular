@@ -1,18 +1,23 @@
-
-import {Table , Column, Model, HasOne } from 'sequelize-typescript';
-
+import { Table, Column, Model, HasOne, Unique, Default } from "sequelize-typescript";
 
 @Table
 export class User extends Model<User> {
-    
-        @Column
-        nickname:string;
+  @Unique
+  @Column
+  nickname: string;
 
-        @Column
-        email: string;
-    
-        @Column
-        password: string;
-    
+  @Unique
+  @Column
+  email: string;
+
+  @Column
+  password: string;
+
+  @Default("")
+  @Column
+  token: string;
+
+  @Default(true)
+  @Column
+  isValid: boolean;
 }
-
