@@ -4,22 +4,23 @@ import { Request, Response } from "express";
 const userService = new UserService();
 
 export class UserController {
-  public async createUser(req: Request, res: Response) {
+  
+  public async registerUser(req: Request, res: Response) {
     try {
       const user = req.body;
       const { statusCode, response } = await userService.register(user);
-      return res.status(statusCode).json(response);
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+      res.status(500).send(err.message);
     }
   }
 
   public async getAllUsers(req: Request, res: Response) {
     try {
       const { statusCode, response } = await userService.getAllUsers();
-      return res.status(statusCode).json(response);
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+       res.status(500).send(err.message);
     }
   }
 
@@ -27,9 +28,9 @@ export class UserController {
     try {
       const { id } = req.params;
       const { statusCode, response } = await userService.getUserByID(id);
-      return res.status(statusCode).json(response);
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+      res.status(500).send(err.message);
     }
   }
 
@@ -37,9 +38,9 @@ export class UserController {
     const { email, password } = req.body;
     try {
       const { statusCode, response } = await userService.login(email, password);
-      return res.status(statusCode).json(response);
+       res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err);
+      res.status(500).send(err);
     }
   }
 }
