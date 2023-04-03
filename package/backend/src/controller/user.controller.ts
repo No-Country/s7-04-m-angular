@@ -42,4 +42,26 @@ export class UserController {
       return res.status(500).send(err);
     }
   }
+
+  public async forgetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    try {
+      const { statusCode, response } = await userService.forgetPassword(email);
+      return res.status(statusCode).json(response);
+    } catch (err: any) {
+      return res.status(500).send(err);
+    }
+  }
+
+  public async changePassword(req: Request, res: Response) {
+    const { password } = req.body;
+    const { id } = req.params;
+    const { token } = req;
+    try {
+      const { statusCode, response } = await userService.changePassword(id, password, token);
+      return res.status(statusCode).json(response);
+    } catch (err: any) {
+      return res.status(500).send(err);
+    }
+  }
 }

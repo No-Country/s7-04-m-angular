@@ -6,11 +6,6 @@ import ResponseParse, { ResponseParsed } from "../utils/responseParse";
 import { jwtGenerate } from "../utils/jwtGenerate";
 import { Role } from "../db/models/role.model";
 
-type dataType = {
-  id?: string;
-  email?: string;
-};
-
 export class UserService {
   private userRepository = sequelize.getRepository(User);
   private roleRepository = sequelize.getRepository(Role);
@@ -79,6 +74,60 @@ export class UserService {
       const data = { ...user, password: hPassword, roleId: 1 };
       const newUser = await this.userRepository.create(data);
       return ResponseParse(201, { nickname: newUser.nickname, id: newUser.id });
+    } catch (err: any) {
+      return ResponseParse(500, err.message);
+    }
+  }
+
+  public async forgetPassword(email: string): Promise<ResponseParsed> {
+    try {
+      const existsUser = await this.userRepository.findOne({
+        where: { email },
+        include: [this.roleRepository],
+      });
+      if (!existsUser) {
+        return ResponseParse(400, "User not found");
+      }
+      const token = jwtGenerate(existsUser.id, existsUser.role.name, "10m");
+      await this.userRepository.update(
+        { token },
+        {
+          where: {
+            id: existsUser.id,
+          },
+        }
+      );
+
+      return ResponseParse(200, "Email sending");
+    } catch (err: any) {
+      return ResponseParse(500, err.message);
+    }
+  }
+
+  public async changePassword(id: string, password: string, token: string) {
+    try {
+      const existsUser = await this.userRepository.findOne({ where: { id } });
+      // check if user exists
+      if (!existsUser) {
+        return ResponseParse(404, "User not found");
+      }
+
+      // compare tokens
+      if (token !== existsUser.token) {
+        return ResponseParse(401, "Invalid user token");
+      }
+
+      const hPassword = await hashPassword(password);
+      await this.userRepository.update(
+        { token: "", password: hPassword },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+
+      return ResponseParse(200, "Password changed");
     } catch (err: any) {
       return ResponseParse(500, err.message);
     }
