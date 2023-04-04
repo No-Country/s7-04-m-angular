@@ -11,6 +11,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './views/home/home.component';
 import { UserComponent } from './views/user/user.component';
+import { MaterialModule } from './modules/material/material.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { UserComponent } from './views/user/user.component';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    MaterialModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
