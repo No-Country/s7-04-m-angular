@@ -3,12 +3,20 @@ import sequelize from "../db/config/db.config";
 import { hashPassword } from "../utils/hashPassword";
 import { comparePasswords } from "../utils/comparePasswords";
 import ResponseParse, { ResponseParsed } from "../utils/responseParse";
-import { jwtGenerate } from "../utils/jwtGenerate";
 import { Role } from "../db/models/role.model";
+import JWTService from "./jwt.service";
+import { Repository } from "sequelize-typescript";
 
 export class UserService {
-  private userRepository = sequelize.getRepository(User);
-  private roleRepository = sequelize.getRepository(Role);
+  private readonly userRepository: Repository<User>;
+  private readonly roleRepository: Repository<Role>;
+  private readonly jwtService: JWTService;
+
+  constructor() {
+    this.jwtService = new JWTService();
+    this.userRepository = sequelize.getRepository(User);
+    this.roleRepository = sequelize.getRepository(Role);
+  }
 
   public async getAllUsers(): Promise<ResponseParsed> {
     try {
@@ -51,7 +59,7 @@ export class UserService {
       }
 
       // create jwt
-      const token = jwtGenerate(existsUser.id, existsUser.role.name, "1d");
+      const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name });
 
       const user = {
         id: existsUser.id,
@@ -88,7 +96,7 @@ export class UserService {
       if (!existsUser) {
         return ResponseParse(400, "User not found");
       }
-      const token = jwtGenerate(existsUser.id, existsUser.role.name, "10m");
+      const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name });
       await this.userRepository.update(
         { token },
         {
