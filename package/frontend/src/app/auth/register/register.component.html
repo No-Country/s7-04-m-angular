@@ -1,0 +1,49 @@
+<div class="wrapper">
+  <div class="body">
+    <form>
+      <div>
+        <h1>Register</h1>
+      </div>
+      <div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="ingrese username"
+          formControlName="username"
+        />
+        <label>username</label>
+      </div>
+      <div>
+        <input
+          type="email"
+          class="form-control"
+          placeholder="ingrese email"
+          formControlName="email"
+        />
+        <label>email</label>
+      </div>
+      <div>
+        <input
+          type="password"
+          class="form-control"
+          placeholder="ingrese password"
+          formControlName="password"
+        />
+        <label>Usuario</label>
+      </div>
+      <div>
+        <input
+          type="password"
+          class="form-control"
+          placeholder="confirme password"
+          formControlName="password"
+        />
+        <label>repetir contraseña</label>
+      </div>
+      <div>
+        <button type="submit">Aceptar</button>
+      </div>
+      <p>No tienes cuenta? <a routerLink="/signin">Registrate!</a></p>
+    </form>
+  </div>
+</div>
