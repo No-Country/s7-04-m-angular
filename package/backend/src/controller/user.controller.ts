@@ -1,73 +1,68 @@
 import { UserService } from "../service/user.service";
 import { Request, Response } from "express";
-import { jwtGenerate } from "../utils/jwtGenerate";
-import { comparePasswords } from "../utils/comparePasswords";
 
 const userService = new UserService();
 
 export class UserController {
-  public async createUser(req: Request, res: Response) {
+  
+  public async registerUser(req: Request, res: Response) {
     try {
       const user = req.body;
-      const createdUser = await userService.createUser(user);
-      return res.status(201).send(createdUser);
+      const { statusCode, response } = await userService.register(user);
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+      res.status(500).send(err.message);
     }
   }
 
   public async getAllUsers(req: Request, res: Response) {
     try {
-      const allUsers = await userService.getAllUsers();
-      if (allUsers.length < 1) {
-        return res.status(404).json({ msg: "There isn't any user" });
-      }
-      return res.status(200).json({ users: allUsers });
+      const { statusCode, response } = await userService.getAllUsers();
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+       res.status(500).send(err.message);
     }
   }
 
   public async getUserByID(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const existsUser = await userService.getUser({ id });
-      if (!existsUser) {
-        return res.status(404).json({ msg: "User don't found" });
-      }
-      return res.status(200).json({ user: existsUser });
+      const { statusCode, response } = await userService.getUserByID(id);
+      res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+      res.status(500).send(err.message);
     }
   }
 
   public async login(req: Request, res: Response) {
     const { email, password } = req.body;
     try {
-      const existsUser = await userService.getUser({ email });
-      if (!existsUser) {
-        return res.status(404).json({ msg: "User don't found" });
-      }
-
-      // compare passwords
-      const validPassword = await comparePasswords(password, existsUser.password);
-      if (!validPassword) {
-        return res.status(403).json({
-          msg: "Passwords are different",
-        });
-      }
-
-      // create jwt
-      const token = jwtGenerate(existsUser.id, "user", "1d");
-
-      const user = {
-        id: existsUser.id,
-        token,
-      };
-
-      return res.status(200).json({ user: user });
+      const { statusCode, response } = await userService.login(email, password);
+       res.status(statusCode).json(response);
     } catch (err: any) {
-      return res.status(500).send(err.message);
+      res.status(500).send(err);
+    }
+  }
+
+  public async forgetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    try {
+      const { statusCode, response } = await userService.forgetPassword(email);
+      return res.status(statusCode).json(response);
+    } catch (err: any) {
+      return res.status(500).send(err);
+    }
+  }
+
+  public async changePassword(req: Request, res: Response) {
+    const { password } = req.body;
+    const { id } = req.params;
+    const { token } = req;
+    try {
+      const { statusCode, response } = await userService.changePassword(id, password, token);
+      return res.status(statusCode).json(response);
+    } catch (err: any) {
+      return res.status(500).send(err);
     }
   }
 }

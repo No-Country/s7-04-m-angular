@@ -1,6 +1,7 @@
-import { Table, Column, Model, HasOne, Unique, Default } from "sequelize-typescript";
+import { Table, Column, Model, Unique, Default, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { Role } from "./role.model";
 
-@Table
+@Table({ paranoid: true })
 export class User extends Model<User> {
   @Unique
   @Column
@@ -20,4 +21,11 @@ export class User extends Model<User> {
   @Default(true)
   @Column
   isValid: boolean;
+
+  @ForeignKey(() => Role)
+  @Column
+  roleId: number;
+
+  @BelongsTo(() => Role)
+  role: Role;
 }
