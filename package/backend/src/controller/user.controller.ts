@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 const userService = new UserService();
 
 export class UserController {
-  
   public async registerUser(req: Request, res: Response) {
     try {
       const user = req.body;
@@ -20,7 +19,7 @@ export class UserController {
       const { statusCode, response } = await userService.getAllUsers();
       res.status(statusCode).json(response);
     } catch (err: any) {
-       res.status(500).send(err.message);
+      res.status(500).send(err.message);
     }
   }
 
@@ -38,7 +37,7 @@ export class UserController {
     const { email, password } = req.body;
     try {
       const { statusCode, response } = await userService.login(email, password);
-       res.status(statusCode).json(response);
+      res.status(statusCode).json(response);
     } catch (err: any) {
       res.status(500).send(err);
     }
