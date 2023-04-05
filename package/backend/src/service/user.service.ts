@@ -6,6 +6,7 @@ import ResponseParse, { ResponseParsed } from "../utils/responseParse";
 import { Role } from "../db/models/role.model";
 import JWTService from "./jwt.service";
 import { Repository } from "sequelize-typescript";
+import { sendMail } from "../utils/sendMail";
 
 export class UserService {
   private readonly userRepository: Repository<User>;
@@ -79,8 +80,21 @@ export class UserService {
         return ResponseParse(400, "User already exists");
       }
       const hPassword = await hashPassword(user.password);
-      const data = { ...user, password: hPassword, roleId: 1 };
+      const data = { ...user, password: hPassword, roleId: 1, isValid: true };
       const newUser = await this.userRepository.create(data);
+      const token = this.jwtService.sign({ id: newUser.id, role: "user" });
+      await this.userRepository.update({ token }, { where: { id: newUser.id } });
+
+      const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/validateAccount/${newUser.id}/${token}`;
+
+      const subject: string = "Activate Account";
+      const message: string = `
+      <div>
+      <p>Active account</p>
+      <a href=${url}>Validate</a>
+      </div>`;
+      await sendMail(user.email, subject, message);
+
       return ResponseParse(201, { nickname: newUser.nickname, id: newUser.id });
     } catch (err: any) {
       return ResponseParse(500, err.message);
@@ -105,6 +119,16 @@ export class UserService {
           },
         }
       );
+
+      const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/changePassword/${existsUser.id}/${token}`;
+
+      const subject: string = "Change Password";
+      const message: string = `
+      <div>
+      <p>Change password</p>
+      <a href=${url}>Change</a>
+      </div>`;
+      await sendMail(existsUser.email, subject, message);
 
       return ResponseParse(200, "Email sending");
     } catch (err: any) {
