@@ -9,9 +9,12 @@ import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { HomeComponent } from './views/home/home.component';
 import { UserComponent } from './views/user/user.component';
 import { MaterialModule } from './modules/material/material.module';
+import { httpInterceptorProviders } from './auth/auth.interceptor';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +26,7 @@ import { MaterialModule } from './modules/material/material.module';
     FooterComponent,
     HomeComponent,
     UserComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,8 +34,9 @@ import { MaterialModule } from './modules/material/material.module';
     HttpClientModule,
     ReactiveFormsModule,
     MaterialModule,
+    FormsModule,
   ],
-  providers: [],
+  providers: [httpInterceptorProviders],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

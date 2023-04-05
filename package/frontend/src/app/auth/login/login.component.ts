@@ -1,34 +1,53 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-
+import { StorageService } from '../storage.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+  form: any = {
+    email: null,
+    password: null,
+  };
+  isLoggedIn = false;
+  isLoginFailed = false;
+  errorMessage = '';
+  roles: string[] = [];
+
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService
-  ) {
-    this.loginForm = this.formBuilder.group({
-      email: ['', Validators.required, Validators.email],
-      password: ['', [Validators.required]],
+    private authService: AuthService,
+    private storageService: StorageService
+  ) {}
+
+  ngOnInit(): void {
+    if (this.storageService.isLoggedIn()) {
+      this.isLoggedIn = true;
+      this.roles = this.storageService.getUser().roles;
+    }
+  }
+
+  onSubmit(): void {
+    const { nickname, password } = this.form;
+
+    this.authService.login(nickname, password).subscribe({
+      next: (data) => {
+        this.storageService.saveUser(data);
+
+        this.isLoginFailed = false;
+        this.isLoggedIn = true;
+        this.roles = this.storageService.getUser().roles;
+        this.reloadPage();
+      },
+      error: (err) => {
+        this.errorMessage = err.error.message;
+        this.isLoginFailed = true;
+      },
     });
   }
 
-  ngOnInit(): void {}
-  onSubmit() {
-    /* this.authService.submitLoginForm(this.loginForm.value).subscribe({
-      next: (response) => {
-        console.log(response);
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    }); */
-    console.log(this.loginForm.value);
+  reloadPage(): void {
+    window.location.reload();
   }
 }

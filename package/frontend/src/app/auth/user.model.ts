@@ -1,2 +1,5 @@
-export interface User.Model {
+export interface User {
+  nickName: string;
+  email: string;
+  password: string;
 }
