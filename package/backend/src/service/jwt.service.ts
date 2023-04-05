@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { UserRequest } from "../Types/userRequest";
+import { IUserRequest } from "../Types/IUserRequest";
 
 export default class JWTService {
   private readonly secret: any;
@@ -10,8 +10,8 @@ export default class JWTService {
     this.expiresIn = process.env.JWT_EXPIRATION;
   }
 
-  public sign(payload: UserRequest): string {
-    return jwt.sign(payload, this.secret, { expiresIn: this.expiresIn });
+  public sign(payload: IUserRequest,expiresIn?:string): string {
+    return jwt.sign(payload, this.secret, { expiresIn: expiresIn? expiresIn : this.expiresIn });
   }
 
   public verify(token: string): any {
