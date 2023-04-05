@@ -110,7 +110,7 @@ export class UserService {
       if (!existsUser) {
         return ResponseParse(400, "User not found");
       }
-      const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name });
+      const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name }, "15m");
       await this.userRepository.update(
         { token },
         {

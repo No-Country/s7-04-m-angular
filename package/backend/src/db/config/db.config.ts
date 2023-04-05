@@ -10,7 +10,7 @@ const connection = new Sequelize({
     database: process.env.DB_NAME,
     models: [__dirname + './../models'],
     modelMatch: (filename, member) => {
-        return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
+        return filename.substring(0, filename.indexOf('.model')).toLowerCase() === member.toLowerCase();
       },
     
 })
