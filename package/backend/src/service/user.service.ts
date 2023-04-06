@@ -7,100 +7,112 @@ import { Role } from "../db/models/role.model";
 import JWTService from "./jwt.service";
 import { Repository } from "sequelize-typescript";
 import { sendMail } from "../utils/sendMail";
+import { RegisterUserDTO } from "../dto/user/register.user.dto";
+import { UserError } from "../error/User.error";
+import { LoginResponseDTO } from "../dto/user/login.response.dto";
+import Paginator from "../utils/paginator";
+import { IPaginated } from "../interfaces/IPaginated";
 
 export class UserService {
   private readonly userRepository: Repository<User>;
   private readonly roleRepository: Repository<Role>;
   private readonly jwtService: JWTService;
+  private readonly paginator: Paginator<User>;
 
   constructor() {
     this.jwtService = new JWTService();
     this.userRepository = sequelize.getRepository(User);
     this.roleRepository = sequelize.getRepository(Role);
+    this.paginator = new Paginator(this.userRepository);
   }
 
-  public async getAllUsers(): Promise<ResponseParsed> {
-    try {
-      const users = await this.userRepository.findAll({ attributes: ["nickname", "email"], where: { isValid: true } });
-      if (users.length < 1) {
-        return ResponseParse(500, "There isn't any user");
-      }
-      return ResponseParse(200, users);
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
+  /**
+   * Get all users
+   * @param page 
+   * @param limit 
+   * @returns Promise<IPaginated<User>>
+   */
+  public async getAllUsers(page = 1, limit = 10): Promise<IPaginated<User>> {      
+      const users = await this.paginator.paginate({ where: { isValid: true } }, page, limit);
+      return users; 
   }
 
-  public async getUserByID(id: string): Promise<ResponseParsed> {
-    try {
-      const existsUser = await this.userRepository.findOne({ where: { id }, attributes: ["nickname", "email"] });
+  /**
+   * Get user by id
+   * @param id 
+   * @returns Promise<User>
+   */
+  public async getUserByID(id: string): Promise<User> {
+      const existsUser = await this.userRepository.findOne({ where: { id }});
       if (!existsUser) {
-        return ResponseParse(404, "User not found");
+        throw new UserError("USER_NOT_FOUND", "User not found");
       }
-      return ResponseParse(200, existsUser);
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
+      return existsUser;
   }
 
-  public async login(email: string, password: string): Promise<ResponseParsed> {
-    try {
+  /**
+   * Perform login
+   * @param email 
+   * @param password 
+   * @throws UserError
+   * @returns Promise<LoginResponseDTO>
+   */
+  public async login(email: string, password: string): Promise<LoginResponseDTO> {
+  
       const existsUser = await this.userRepository.findOne({
         where: { email },
         include: [this.roleRepository],
       });
       if (!existsUser) {
-        return ResponseParse(404, "User not found");
+       throw new UserError("USER_NOT_FOUND", "User not found");
       }
 
       // compare passwords
       const validPassword = await comparePasswords(password, existsUser.password);
       if (!validPassword) {
-        return ResponseParse(403, "Password is invalid");
+        throw new UserError("USER_PASSWORD_INCORRECT", "Invalid password");
       }
 
       // create jwt
       const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name });
 
-      const user = {
-        id: existsUser.id,
-        token,
-      };
-
-      return ResponseParse(200, user);
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
+      return new LoginResponseDTO(existsUser.id, token);
+    
   }
 
-  public async register(user: User): Promise<ResponseParsed> {
-    try {
-      const existsUser = await this.userRepository.findOne({ where: { email: user.email } });
-      if (existsUser) {
-        return ResponseParse(400, "User already exists");
-      }
-      const hPassword = await hashPassword(user.password);
-      const data = { ...user, password: hPassword, roleId: 1, isValid: true };
-      const newUser = await this.userRepository.create(data);
+  /**
+   * Creates a new user in the database (coming from the register form)
+   * @param user
+   * @throws UserError
+   * @returns Promise<User>
+   * @todo Send email to validate account
+   * @todo Validate account
+   * */
+  public async register(user: RegisterUserDTO): Promise<User> {
+    const existsUser = await this.userRepository.findOne({ where: { email: user.email } });
+    if (existsUser) {
+      throw new UserError("USER_ALREADY_EXISTS", "User already exists");
+    }
+    const hPassword = await hashPassword(user.password);
+    const data = { ...user, password: hPassword, roleId: 1, isValid: true };
+    const newUser = await this.userRepository.create(data);
+
+    /* //Validar cuenta
       const token = this.jwtService.sign({ id: newUser.id, role: "user" });
       await this.userRepository.update({ token }, { where: { id: newUser.id } });
-
       const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/validateAccount/${newUser.id}/${token}`;
-
       const subject: string = "Activate Account";
       const message: string = `
       <div>
       <p>Active account</p>
       <a href=${url}>Validate</a>
       </div>`;
-      await sendMail(user.email, subject, message);
+      await sendMail(user.email, subject, message);*/
+    return newUser;
 
-      return ResponseParse(201, { nickname: newUser.nickname, id: newUser.id });
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
   }
 
+  
   public async forgetPassword(email: string): Promise<ResponseParsed> {
     try {
       const existsUser = await this.userRepository.findOne({
@@ -164,4 +176,29 @@ export class UserService {
       return ResponseParse(500, err.message);
     }
   }
+
+
+
+  public async updateUser(id: string, user: User): Promise<Object> {
+    const existsUser = await this.userRepository.findOne({ where: { id } });
+    if (!existsUser) {
+      throw new UserError("USER_NOT_FOUND", "User not found");
+    }
+    const updatedUser = await this.userRepository.update(user, { where: { id } });
+    return updatedUser;
+  }
+
+
+
+  public async deleteUser(id: string): Promise<Object> {
+    const existsUser = await this.userRepository.findOne({ where: { id } });
+    if (!existsUser) {
+      throw new UserError("USER_NOT_FOUND", "User not found");
+    }
+    const deletedUser = await this.userRepository.destroy({ where: { id } });
+    return deletedUser;
+  }
+
+  
+
 }

@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import 'reflect-metadata';
 dotenv.config();
 import express, { Application } from "express";
 import morgan from "morgan";

@@ -25,7 +25,9 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
+    "await-to-js": "^3.0.0",
     "bcrypt": "^5.1.0",
+    "class-transformer": "^0.5.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
