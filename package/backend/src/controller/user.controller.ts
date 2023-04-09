@@ -4,9 +4,9 @@ import { plainToInstance } from "class-transformer";
 import { RegisterUserDTO } from "../dto/user/register.user.dto";
 import { UserCreatedDTO } from "../dto/user/created.user.dto";
 import { HttpStatus } from "../utils/enum/http.status";
-import { UserError } from "../error/User.error";
 import { UserDTO } from "../dto/user/user.dto";
 import { UsersPaginatedDTO } from "../dto/user/users.paginated.dto";
+import { LoginUserDTO } from "../dto/user/login.request.dto";
 
 
 //const userService = new UserService();
@@ -65,7 +65,7 @@ export class UserController {
   public async login(req: Request, res: Response) {
 
     try {
-      const { email, password } = req.body;
+      const { email, password } = plainToInstance(LoginUserDTO, req.body, { excludeExtraneousValues: true });
       const loginResponse = await this.userService.login(email, password);
       res.status(HttpStatus.OK).json(loginResponse);
     } catch (err: any) {

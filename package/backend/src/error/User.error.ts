@@ -1,4 +1,5 @@
 import { HttpStatus } from "../utils/enum/http.status";
+import { ErrorBase } from "./ErrorBase";
 
 type UserErrorName =
     | "USER_NOT_FOUND"
@@ -13,7 +14,7 @@ type UserErrorName =
 
 
 
-export class UserError extends Error {
+export class UserError extends ErrorBase<UserErrorName> {
 
     name: UserErrorName;
     message: string;
@@ -21,7 +22,7 @@ export class UserError extends Error {
     cause: any;
 
     constructor(name: UserErrorName, message: string, cause?: any | Error) {
-        super(message);
+        super({ name, message, cause });
         this.name = name;
         this.status = this.handleErrorCode(name);
         this.message = message;
