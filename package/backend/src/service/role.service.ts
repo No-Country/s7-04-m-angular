@@ -1,14 +1,14 @@
 import { Role } from "../db/models/role.model";
-import ResponseParse, { ResponseParsed } from "../utils/responseParse";
-import sequelize from "../db/config/db.config";
-import { Repository } from "sequelize-typescript";
+//import sequelize from "../db/config/db.config";
+import { Repository, Sequelize } from "sequelize-typescript";
 import { RoleError } from "../error/Role.error";
-import { ResponseDTO } from "../dto/role/response.dto";
+import { ResponseDTO } from "../dto/general/response.dto";
+import { CreateRoleRequestDTO } from "../dto/role/role.create.dto";
 
 export class RoleService {
   private readonly roleRepo: Repository<Role>;
 
-  constructor() {
+  constructor(sequelize:Sequelize) {
     this.roleRepo = sequelize.getRepository(Role);
   }
 
@@ -36,7 +36,7 @@ export class RoleService {
       return roles;
   }
 
-  public async createRole(role: Role): Promise<Role> {
+  public async createRole(role: CreateRoleRequestDTO): Promise<Role> {
       const existsRole = await this.roleRepo.findOne({ where: { name: role.name } });
       if (existsRole) {
         throw new RoleError("ROLE_ALREADY_EXISTS", "Role already exists");
@@ -45,7 +45,7 @@ export class RoleService {
       return newRole;
   }
 
-  public async updateRole(id: string, role: Role): Promise<ResponseDTO> {
+  public async updateRole(id: string, role: CreateRoleRequestDTO): Promise<ResponseDTO> {
  
       const existsRole = await this.roleRepo.findOne({ where: { id } });
       if (!existsRole) {

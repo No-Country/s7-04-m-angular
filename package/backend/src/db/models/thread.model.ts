@@ -3,6 +3,9 @@ import { Tag } from "./tag.model";
 import { ThreadTag } from "./threadTag.model";
 import { User } from "./user.model";
 import { Category } from "./category.model";
+import { Reply } from "./reply.model";
+import { ReplyThread } from "./replyThread.model";
+
 
 @Table({ paranoid: true })
 export class Thread extends Model<Thread> {
@@ -23,6 +26,9 @@ export class Thread extends Model<Thread> {
 
     @BelongsToMany(() => Tag, () => ThreadTag)
     tags: Tag[];
+
+    @BelongsToMany(()=>Reply,()=>ReplyThread)
+    replies: Reply[];
     
     @BelongsTo(() => User)
     user: User;

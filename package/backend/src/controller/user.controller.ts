@@ -1,5 +1,6 @@
 import { UserService } from "../service/user.service";
 import { Request, Response } from "express";
+import sequelize from '../db/config/db.config'
 import { plainToInstance } from "class-transformer";
 import { RegisterUserDTO } from "../dto/user/register.user.dto";
 import { UserCreatedDTO } from "../dto/user/created.user.dto";
@@ -7,6 +8,8 @@ import { HttpStatus } from "../utils/enum/http.status";
 import { UserDTO } from "../dto/user/user.dto";
 import { UsersPaginatedDTO } from "../dto/user/users.paginated.dto";
 import { LoginUserDTO } from "../dto/user/login.request.dto";
+import { UpdateUserDTO } from "../dto/user/update.user.dto";
+import { CreateUserDTO } from "../dto/user/create.user.dto";
 
 
 //const userService = new UserService();
@@ -21,8 +24,24 @@ export class UserController {
    private readonly userService: UserService;
 
   constructor(){
-    this.userService = new UserService();
+    this.userService = new UserService(sequelize);
   }
+
+
+  public async createUser(req: Request, res: Response) {
+    try {
+      //Mapeo el body de la request en una instancia de CreateUserDTO 
+      const userDTO = plainToInstance(CreateUserDTO, req.body, { excludeExtraneousValues: true });
+      const usrCreated = await this.userService.createUser(userDTO);
+      //Mapeo User a UserDTO
+      const userCreatedDTO = plainToInstance(UserDTO, usrCreated, { excludeExtraneousValues: true });
+      res.status(HttpStatus.CREATED).json(userCreatedDTO);
+    } catch (err: any) {
+      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
+    }
+  }
+
+  
 
  
   public async registerUser(req: Request, res: Response) {
@@ -94,4 +113,29 @@ export class UserController {
       res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
     }
   }
+
+
+  public async deleteUser(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const response = await this.userService.deleteUser(id);
+      res.status(HttpStatus.OK).json(response);
+    } catch (err: any) {
+      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
+    }
+  }
+
+  public async updateUser(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const updateUserDTO = plainToInstance(UpdateUserDTO, req.body, { excludeExtraneousValues: true });
+      const response = await this.userService.updateUser(id, updateUserDTO);
+      res.status(HttpStatus.OK).json(response);
+    } catch (err: any) {
+      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
+    }
+  }
+
+
+
 }
