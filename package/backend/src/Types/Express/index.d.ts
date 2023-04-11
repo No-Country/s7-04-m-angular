@@ -1,11 +1,12 @@
 import { Request } from "express";
-import { UserRequest } from "../userRequest";
-export {}
+import { IUserRequest } from "../IUserRequest";
+export {};
 
 declare global {
-    namespace Express {
-        export interface Request {
-            user:UserRequest ;
-        }
+  namespace Express {
+    export interface Request {
+      user: IUserRequest;
+      token: string;
     }
+  }
 }

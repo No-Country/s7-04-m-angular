@@ -14,11 +14,13 @@ export class User extends Model<User> {
   @Column
   password: string;
 
-  @Default("")
+  @Column
+  image: string;
+
   @Column
   token: string;
 
-  @Default(true)
+  @Default(false)
   @Column
   isValid: boolean;
 

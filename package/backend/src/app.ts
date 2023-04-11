@@ -1,10 +1,11 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+import 'reflect-metadata';
+//DOTENV SE CARGA DENTRO DEL SIGUIENTE IMPORT, NO MOVER
+import connection from "./db/config/db.config";
+
 import express, { Application } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import router from "./routes/index";
-import connection from "./db/config/db.config";
 
 class Server {
   public app: Application;
@@ -18,7 +19,12 @@ class Server {
   config(): void {
     this.app.set("port", process.env.PORT || 3000);
     this.app.use(morgan("dev"));
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: true,
+        credentials: true,
+      })
+    );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
   }
