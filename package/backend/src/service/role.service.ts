@@ -45,7 +45,7 @@ export class RoleService {
       return newRole;
   }
 
-  public async updateRole(id: string, role: CreateRoleRequestDTO): Promise<ResponseDTO> {
+  public async updateRole(id: number, role: CreateRoleRequestDTO): Promise<ResponseDTO> {
  
       const existsRole = await this.roleRepo.findOne({ where: { id } });
       if (!existsRole) {
@@ -57,7 +57,7 @@ export class RoleService {
     
   }
 
-  public async deleteRole(id: string): Promise<ResponseDTO> {
+  public async deleteRole(id: number): Promise<ResponseDTO> {
  
       const existsRole = await this.roleRepo.findOne({ where: { id } });
       if (!existsRole) {

@@ -1,140 +1,94 @@
 import { UserService } from "../service/user.service";
-import { Request, Response } from "express";
 import sequelize from '../db/config/db.config'
 import { plainToInstance } from "class-transformer";
-import { RegisterUserDTO } from "../dto/user/register.user.dto";
 import { UserCreatedDTO } from "../dto/user/created.user.dto";
 import { HttpStatus } from "../utils/enum/http.status";
 import { UserDTO } from "../dto/user/user.dto";
 import { UsersPaginatedDTO } from "../dto/user/users.paginated.dto";
-import { LoginUserDTO } from "../dto/user/login.request.dto";
 import { UpdateUserDTO } from "../dto/user/update.user.dto";
 import { CreateUserDTO } from "../dto/user/create.user.dto";
+import { ResponseDTO } from "../dto/general/response.dto";
+import { Body, Controller, Get, Path, Post, Put, Query, Route, SuccessResponse, Delete, Response, Security, Tags } from 'tsoa';
+import { validateOrReject } from "class-validator";
 
 
-//const userService = new UserService();
-type getAllQuery = {
-  limit?: number;
-  page?: number;
-};
 
+@Tags('User')
+@Route('api/v1/users')
+@Security('jwt', ['admin'])
+export class UserController extends Controller {
 
-export class UserController {
+  private readonly userService: UserService;
 
-   private readonly userService: UserService;
-
-  constructor(){
+  constructor() {
+    super();
     this.userService = new UserService(sequelize);
   }
 
 
-  public async createUser(req: Request, res: Response) {
-    try {
-      //Mapeo el body de la request en una instancia de CreateUserDTO 
-      const userDTO = plainToInstance(CreateUserDTO, req.body, { excludeExtraneousValues: true });
-      const usrCreated = await this.userService.createUser(userDTO);
-      //Mapeo User a UserDTO
-      const userCreatedDTO = plainToInstance(UserDTO, usrCreated, { excludeExtraneousValues: true });
-      res.status(HttpStatus.CREATED).json(userCreatedDTO);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
+  @Post()
+  @SuccessResponse('201', 'Created')
+  public async createUser(@Body() body: CreateUserDTO): Promise<UserCreatedDTO> {
+   
+    //Mapeo el body de la request en una instancia de CreateUserDTO
+    const userDTO = plainToInstance(CreateUserDTO, body, { excludeExtraneousValues: true });
+    //Valido el body
+    await validateOrReject(userDTO, { validationError: { target: false } });
+    
+    const usrCreated = await this.userService.createUser(userDTO);
+    //Mapeo User a UserDTO
+    const userCreatedDTO = plainToInstance(UserCreatedDTO, usrCreated, { excludeExtraneousValues: true });
+    this.setStatus(HttpStatus.CREATED);
+    return userCreatedDTO;
 
-  
-
- 
-  public async registerUser(req: Request, res: Response) {
-    try {
-      //Mapeo el body de la request en una instancia de RegisterUserDTO
-      const userDTO = plainToInstance(RegisterUserDTO, req.body, { excludeExtraneousValues: true }); 
-      const usrCreated = await this.userService.register(userDTO);
-      //Mapeo User a UserCreatedDTO
-      const userCreatedDTO = plainToInstance(UserCreatedDTO, usrCreated, { excludeExtraneousValues: true });
-      res.status(HttpStatus.CREATED).json(userCreatedDTO);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
-
-  public async getAllUsers(req: Request, res: Response) {
-    try { 
-      const query = req.query as getAllQuery;
-      const users = await this.userService.getAllUsers(query.page,query.limit);
-      //Mapeo Users a UsersPaginatedDTO
-      const usersPaginatedDTO = plainToInstance(UsersPaginatedDTO, users, { excludeExtraneousValues: true });
-      res.status(HttpStatus.OK).json(usersPaginatedDTO);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
-
-  public async getUserByID(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const user = await this.userService.getUserByID(id);
-      //Mapeo User a UserDTO
-      const userDTO = plainToInstance(UserDTO, user, { excludeExtraneousValues: true });
-      res.status(HttpStatus.OK).json(userDTO);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
-
-  public async login(req: Request, res: Response) {
-
-    try {
-      const { email, password } = plainToInstance(LoginUserDTO, req.body, { excludeExtraneousValues: true });
-      const loginResponse = await this.userService.login(email, password);
-      res.status(HttpStatus.OK).json(loginResponse);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
-
-  public async forgetPassword(req: Request, res: Response) {
-    const { email } = req.body;
-    try {
-      const { statusCode, response } = await this.userService.forgetPassword(email);
-      res.status(statusCode).json(response);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
-  }
-
-  public async changePassword(req: Request, res: Response) {
-    const { password } = req.body;
-    const { id } = req.params;
-    const { token } = req;
-    try {
-      const { statusCode, response } = await this.userService.changePassword(id, password, token);
-      res.status(statusCode).json(response);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
   }
 
 
-  public async deleteUser(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const response = await this.userService.deleteUser(id);
-      res.status(HttpStatus.OK).json(response);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
+  @Get()
+  @SuccessResponse('200', 'OK')
+  public async getAllUsers(@Query() page?: number, @Query() limit?: number ): Promise<UsersPaginatedDTO> {
+    const users = await this.userService.getAllUsers(page, limit);
+    //Mapeo Users a UsersPaginatedDTO
+    const usersPaginatedDTO = plainToInstance(UsersPaginatedDTO, users, { excludeExtraneousValues: true });
+    this.setStatus(HttpStatus.OK);
+    return usersPaginatedDTO;
   }
 
-  public async updateUser(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const updateUserDTO = plainToInstance(UpdateUserDTO, req.body, { excludeExtraneousValues: true });
-      const response = await this.userService.updateUser(id, updateUserDTO);
-      res.status(HttpStatus.OK).json(response);
-    } catch (err: any) {
-      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
-    }
+
+
+  @Get('{id}')
+  @SuccessResponse('200', 'OK')
+  public async getUserByID(@Path() id: number): Promise<UserDTO> {
+    const user = await this.userService.getUserByID(id);
+    //Mapeo User a UserDTO
+    const userDTO = plainToInstance(UserDTO, user, { excludeExtraneousValues: true });
+    this.setStatus(HttpStatus.OK)
+    return userDTO;
   }
+
+
+  @Delete('{id}')
+  @SuccessResponse('200', 'OK')
+  public async deleteUser(@Path() id: number): Promise<ResponseDTO> {
+    const response = await this.userService.deleteUser(id);
+    this.setStatus(HttpStatus.OK)
+    return response;
+  }
+
+  @Put('{id}')
+  @SuccessResponse('200', 'OK')
+  public async updateUser(@Path() id: number, @Body() body: UpdateUserDTO): Promise<ResponseDTO> {
+
+    const updateUserDto = plainToInstance(UpdateUserDTO, body, { excludeExtraneousValues: true });
+    //Valido el body
+    await validateOrReject(updateUserDto, { validationError: { target: false } });
+    const response = await this.userService.updateUser(id, updateUserDto);
+    this.setStatus(HttpStatus.OK)
+    return response;
+
+  }
+
+
 
 
 
