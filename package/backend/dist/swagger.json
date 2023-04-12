@@ -161,6 +161,35 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CategoryDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CategoryCreateDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"RoleDTO": {
 				"properties": {
 					"id": {
@@ -178,7 +207,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ValidateErrorJSON": {
+			"IValidateErrorJSON": {
 				"properties": {
 					"message": {
 						"type": "string",
@@ -208,6 +237,110 @@
 				},
 				"required": [
 					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TagDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TagCreateDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ThreadDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"categoryId": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"id",
+					"title",
+					"content",
+					"userId",
+					"categoryId",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ThreadPaginatedDTO": {
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/ThreadDTO"
+						},
+						"type": "array"
+					},
+					"lastPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalRecords": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"hasMorePages": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"data",
+					"lastPage",
+					"totalRecords",
+					"currentPage",
+					"hasMorePages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -486,8 +619,169 @@
 				"tags": [
 					"Auth"
 				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/api/v1/category": {
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/CategoryDTO"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "There are no categories"
+					}
+				},
+				"tags": [
+					"Category"
+				],
 				"security": [],
 				"parameters": []
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CategoryDTO"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "The category already exists"
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CategoryCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/category/{id}": {
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The category does not exist"
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CategoryCreateDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The category does not exist"
+					}
+				},
+				"tags": [
+					"Category"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/api/v1/roles/{id}": {
@@ -545,7 +839,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorJSON"
+									"$ref": "#/components/schemas/IValidateErrorJSON"
 								}
 							}
 						}
@@ -601,7 +895,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorJSON"
+									"$ref": "#/components/schemas/IValidateErrorJSON"
 								}
 							}
 						}
@@ -652,7 +946,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorJSON"
+									"$ref": "#/components/schemas/IValidateErrorJSON"
 								}
 							}
 						}
@@ -688,7 +982,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ValidateErrorJSON"
+									"$ref": "#/components/schemas/IValidateErrorJSON"
 								}
 							}
 						}
@@ -712,6 +1006,250 @@
 							"schema": {
 								"$ref": "#/components/schemas/CreateRoleRequestDTO"
 							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tags": {
+			"get": {
+				"operationId": "GetTags",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TagDTO"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tag"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateTag",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TagDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation Failed"
+					},
+					"422": {
+						"description": "Validation Failed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IValidateErrorJSON"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tag"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TagCreateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tags/{id}": {
+			"put": {
+				"operationId": "UpdateTag",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation Failed"
+					},
+					"404": {
+						"description": "Tag not found"
+					},
+					"422": {
+						"description": "Validation Failed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IValidateErrorJSON"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tag"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TagCreateDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteTag",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Tag not found"
+					}
+				},
+				"tags": [
+					"Tag"
+				],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/thread": {
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ThreadPaginatedDTO"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Thread"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ThreadDTO"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Thread"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {}
 						}
 					}
 				}

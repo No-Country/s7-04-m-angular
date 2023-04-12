@@ -12,9 +12,5 @@ export class CategoryDTO {
     @Expose()
     name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @Expose()
-    description: string;
 
 }

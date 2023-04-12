@@ -5,7 +5,13 @@ import { Controller, ValidationService, FieldErrors, ValidateError, TsoaRoute, H
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AuthController } from './../src/controller/auth.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { CategoryController } from './../src/controller/category.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { RoleController } from './../src/controller/role.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { TagController } from './../src/controller/tag.controller';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { ThreadController } from './../src/controller/thread.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserController } from './../src/controller/user.controller';
 import { expressAuthentication } from './../src/middlewares/security/authentication';
@@ -94,6 +100,23 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CategoryDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CategoryCreateDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RoleDTO": {
         "dataType": "refObject",
         "properties": {
@@ -103,7 +126,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ValidateErrorJSON": {
+    "IValidateErrorJSON": {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"enum","enums":["Validation failed"],"required":true},
@@ -116,6 +139,49 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "TagDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "TagCreateDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ThreadDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "title": {"dataType":"string","required":true},
+            "content": {"dataType":"string","required":true},
+            "userId": {"dataType":"double","required":true},
+            "categoryId": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ThreadPaginatedDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"ThreadDTO"},"required":true},
+            "lastPage": {"dataType":"double","required":true},
+            "totalRecords": {"dataType":"double","required":true},
+            "currentPage": {"dataType":"double","required":true},
+            "hasMorePages": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
     },
@@ -298,6 +364,109 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/category',
+            ...(fetchMiddlewares<RequestHandler>(CategoryController)),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController.prototype.getAll)),
+
+            function CategoryController_getAll(request: any, response: any, next: any) {
+            const args = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new CategoryController();
+
+
+              const promise = controller.getAll.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/category',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController)),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController.prototype.create)),
+
+            function CategoryController_create(request: any, response: any, next: any) {
+            const args = {
+                    body: {"in":"body","name":"body","required":true,"ref":"CategoryCreateDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new CategoryController();
+
+
+              const promise = controller.create.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/api/v1/category/:id',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController)),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController.prototype.update)),
+
+            function CategoryController_update(request: any, response: any, next: any) {
+            const args = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                    body: {"in":"body","name":"body","required":true,"ref":"CategoryCreateDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new CategoryController();
+
+
+              const promise = controller.update.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/api/v1/category/:id',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController)),
+            ...(fetchMiddlewares<RequestHandler>(CategoryController.prototype.delete)),
+
+            function CategoryController_delete(request: any, response: any, next: any) {
+            const args = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new CategoryController();
+
+
+              const promise = controller.delete.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/roles/:id',
             authenticateMiddleware([{"jwt":["admin"]}]),
             ...(fetchMiddlewares<RequestHandler>(RoleController)),
@@ -423,6 +592,161 @@ export function RegisterRoutes(app: Router) {
 
               const promise = controller.deleteRole.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, 200, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/tags',
+            ...(fetchMiddlewares<RequestHandler>(TagController)),
+            ...(fetchMiddlewares<RequestHandler>(TagController.prototype.getTags)),
+
+            function TagController_getTags(request: any, response: any, next: any) {
+            const args = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TagController();
+
+
+              const promise = controller.getTags.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/tags',
+            ...(fetchMiddlewares<RequestHandler>(TagController)),
+            ...(fetchMiddlewares<RequestHandler>(TagController.prototype.createTag)),
+
+            function TagController_createTag(request: any, response: any, next: any) {
+            const args = {
+                    body: {"in":"body","name":"body","required":true,"ref":"TagCreateDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TagController();
+
+
+              const promise = controller.createTag.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/api/v1/tags/:id',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(TagController)),
+            ...(fetchMiddlewares<RequestHandler>(TagController.prototype.updateTag)),
+
+            function TagController_updateTag(request: any, response: any, next: any) {
+            const args = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                    body: {"in":"body","name":"body","required":true,"ref":"TagCreateDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TagController();
+
+
+              const promise = controller.updateTag.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/api/v1/tags/:id',
+            authenticateMiddleware([{"jwt":["admin"]}]),
+            ...(fetchMiddlewares<RequestHandler>(TagController)),
+            ...(fetchMiddlewares<RequestHandler>(TagController.prototype.deleteTag)),
+
+            function TagController_deleteTag(request: any, response: any, next: any) {
+            const args = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TagController();
+
+
+              const promise = controller.deleteTag.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/thread',
+            ...(fetchMiddlewares<RequestHandler>(ThreadController)),
+            ...(fetchMiddlewares<RequestHandler>(ThreadController.prototype.getAll)),
+
+            function ThreadController_getAll(request: any, response: any, next: any) {
+            const args = {
+                    page: {"in":"query","name":"page","dataType":"double"},
+                    limit: {"in":"query","name":"limit","dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new ThreadController();
+
+
+              const promise = controller.getAll.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/thread',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(ThreadController)),
+            ...(fetchMiddlewares<RequestHandler>(ThreadController.prototype.create)),
+
+            function ThreadController_create(request: any, response: any, next: any) {
+            const args = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"any"},
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new ThreadController();
+
+
+              const promise = controller.create.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }

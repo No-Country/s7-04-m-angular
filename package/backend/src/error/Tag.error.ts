@@ -5,6 +5,7 @@ type TagErrorName =
     | "TAG_NOT_FOUND"
     | "TAG_ALREADY_EXISTS"
     | "NO_TAGS_FOUND"
+    | "TAG_NAME_ERROR"
 
 
 export class TagError extends ErrorBase<TagErrorName> {
@@ -26,6 +27,8 @@ export class TagError extends ErrorBase<TagErrorName> {
         switch(name) {
             case "TAG_NOT_FOUND":
                 return HttpStatus.NOT_FOUND;
+            case "TAG_NAME_ERROR":
+                return HttpStatus.BAD_REQUEST;
             case "TAG_ALREADY_EXISTS":
                 return HttpStatus.CONFLICT;
             case "NO_TAGS_FOUND":

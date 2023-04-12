@@ -8,10 +8,4 @@ export class CategoryCreateDTO {
     @Expose()
     name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    @Expose()
-    description: string;
-
-
 }

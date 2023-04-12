@@ -10,10 +10,7 @@ import { CreateRoleRequestDTO } from '../dto/role/role.create.dto';
 import { Body, Controller, Get, Path, Post, Put, Tags, Route, SuccessResponse, Delete, Response, Security} from 'tsoa';
 import { ResponseDTO } from '../dto/general/response.dto';
 
-interface ValidateErrorJSON {
-        message: "Validation failed";
-        details: { [name: string]: unknown };
-      }
+import { IValidateErrorJSON } from '../interfaces/IValidateErrorJSON';
 
 
 @Tags("Role")
@@ -38,7 +35,7 @@ export class RoleController extends Controller {
 
         }
         
-        @Response<ValidateErrorJSON>(422, "Validation Failed")
+        @Response<IValidateErrorJSON>(422, "Validation Failed")
         @Get()
         public async getAllRoles(): Promise<RoleDTO[]> {
                 const roles = await this.roleService.getAllRoles();
@@ -47,7 +44,7 @@ export class RoleController extends Controller {
                 return rolesDto;
         }
 
-        @Response<ValidateErrorJSON>(422, "Validation Failed")
+        @Response<IValidateErrorJSON>(422, "Validation Failed")
         @Post()
         public async createRole(@Body() body: CreateRoleRequestDTO): Promise<RoleDTO> {
                 const createRoleDto = plainToInstance(CreateRoleRequestDTO, body, { excludeExtraneousValues: true });
@@ -59,7 +56,7 @@ export class RoleController extends Controller {
         }
 
 
-        @Response<ValidateErrorJSON>(422, "Validation Failed")
+        @Response<IValidateErrorJSON>(422, "Validation Failed")
         @Put('{id}')
         public async updateRole(@Path() id: number, @Body() body: CreateRoleRequestDTO): Promise<ResponseDTO> {
 
@@ -71,7 +68,7 @@ export class RoleController extends Controller {
         }
 
 
-        @Response<ValidateErrorJSON>(422, "Validation Failed")
+        @Response<IValidateErrorJSON>(422, "Validation Failed")
         @SuccessResponse('200', 'Role Deleted')
         @Delete('{id}')
         public async deleteRole(@Path() id: number): Promise<ResponseDTO> {
