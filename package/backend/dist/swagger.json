@@ -290,6 +290,12 @@
 						"type": "number",
 						"format": "double"
 					},
+					"tags": {
+						"items": {
+							"$ref": "#/components/schemas/TagDTO"
+						},
+						"type": "array"
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time"
@@ -305,6 +311,7 @@
 					"content",
 					"userId",
 					"categoryId",
+					"tags",
 					"createdAt",
 					"updatedAt"
 				],

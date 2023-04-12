@@ -168,6 +168,7 @@ const models: TsoaRoute.Models = {
             "content": {"dataType":"string","required":true},
             "userId": {"dataType":"double","required":true},
             "categoryId": {"dataType":"double","required":true},
+            "tags": {"dataType":"array","array":{"dataType":"refObject","ref":"TagDTO"},"required":true},
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
         },
