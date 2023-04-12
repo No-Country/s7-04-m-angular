@@ -1,37 +1,33 @@
 <div class="wrapper">
   <div class="body">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div>
-        <h1>Login</h1>
-      </div>
-      <div>
-        <label>email</label>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="ingrese email"
-          formControlName="email"
-        />
-      </div>
-      <div>
-        <label>password</label>
-        <input
-          type="password"
-          class="form-control"
-          placeholder="ingrese password"
-          formControlName="password"
-        />
-      </div>
-      <div>
-        <button
-          type="submit"
-          class="btn btn-primary btn-lg"
-          [disabled]="loginForm.invalid"
-        >
-          Aceptar
+    <form [formGroup]="loginForm">
+      <fieldset>
+        <legend>Login</legend>
+        <div class="form-field">
+          <label> Email:</label>
+          <input
+            name="email"
+            id="email"
+            formControlName="email"
+            placeholder="email"
+          />
+        </div>
+        
+        <div class="form-field">
+          <label>Password:</label>
+          <input
+            placeholder="password"
+            name="paswword"
+            id="paswword"
+            formControlName="password"
+          />
+        </div>
+      </fieldset>
+      <div class="form-buttons">
+        <button type="submit" class="button button-primary" (click)="login()">
+          Login
         </button>
       </div>
-      <p>Si no tenes cuenta <a routerLink="/register">Registrate!</a></p>
     </form>
   </div>
 </div>
