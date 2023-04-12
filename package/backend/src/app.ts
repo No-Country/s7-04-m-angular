@@ -1,11 +1,13 @@
 import 'reflect-metadata';
 //DOTENV SE CARGA DENTRO DEL SIGUIENTE IMPORT, NO MOVER
 import connection from "./db/config/db.config";
+import { RegisterRoutes } from "../dist/routes";
 
-import express, { Application } from "express";
+import express, { Application,Response as ExResponse, Request as ExRequest } from "express";
+import swaggerUi from "swagger-ui-express";
 import morgan from "morgan";
 import cors from "cors";
-import router from "./routes/index";
+import  errorHandler from "./utils/errorHandler";
 
 class Server {
   public app: Application;
@@ -27,10 +29,19 @@ class Server {
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
-  }
+    
+    this.app.use("/docs", swaggerUi.serve, async (_req: ExRequest, res: ExResponse) => {
+      return res.send(
+        swaggerUi.generateHTML(await import("../dist/swagger.json"))
+      )})
+    
+  
+
+    }
 
   routes(): void {
-    this.app.use("/api/v1", router);
+    RegisterRoutes(this.app);
+    this.app.use(errorHandler)
   }
 
   async start(): Promise<void> {

@@ -46,7 +46,7 @@ export class UserService {
    * @param id 
    * @returns Promise<User>
    */
-  public async getUserByID(id: string): Promise<User> {
+  public async getUserByID(id: number): Promise<User> {
     const existsUser = await this.userRepository.findOne({ where: { id } });
     if (!existsUser) {
       throw new UserError("USER_NOT_FOUND", "User not found");
@@ -84,6 +84,15 @@ export class UserService {
     
 
 
+  public async getMe(id: number): Promise<User> {
+    const existsUser = await this.userRepository.findOne({ where: { id } });
+    if (!existsUser) {
+      throw new UserError("USER_NOT_FOUND", "User not found");
+    }
+    return existsUser;
+  }
+
+
   /**
    * Perform login
    * @param email 
@@ -107,8 +116,13 @@ export class UserService {
       throw new UserError("USER_PASSWORD_INCORRECT", "Invalid password");
     }
 
+    //validate if user is valid / active
+    if (!existsUser.isValid) {
+      throw new UserError("USER_NOT_ACTIVATED", "User is not active, please contact with the administrator.");
+    }
+
     // create jwt
-    const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name });
+    const token = this.jwtService.sign({ sub: existsUser.id, scope: Array(existsUser.role.name) });
 
     return new LoginResponseDTO(existsUser.id, token);
 
@@ -123,9 +137,12 @@ export class UserService {
    * @todo Validate account
    * */
   public async register(user: RegisterUserDTO): Promise<User> {
-    const existsUser = await this.userRepository.findOne({ where: { email: user.email } });
+
+ 
+    
+    const existsUser = await this.userRepository.findOne({ where: {[Op.or]: [{ email: user.email }, { nickname: user.nickname }]},paranoid:false });
     if (existsUser) {
-      throw new UserError("USER_ALREADY_EXISTS", "User already exists");
+      throw new UserError("USER_ALREADY_EXISTS", "The email or nickname already exists");
     }
     const hPassword = await hashPassword(user.password);
     const data = { ...user, password: hPassword, roleId: 1, isValid: true };
@@ -143,20 +160,20 @@ export class UserService {
       </div>`;
       await sendMail(user.email, subject, message);*/
     return newUser;
+ 
 
   }
 
 
-  public async forgetPassword(email: string): Promise<ResponseParsed> {
-    try {
+  public async forgetPassword(email: string): Promise<ResponseDTO> {
       const existsUser = await this.userRepository.findOne({
         where: { email },
         include: [this.roleRepository],
       });
       if (!existsUser) {
-        return ResponseParse(400, "User not found");
+        throw new UserError("USER_NOT_FOUND", "User not found");
       }
-      const token = this.jwtService.sign({ id: existsUser.id, role: existsUser.role.name }, "15m");
+      const token = this.jwtService.sign({ sub: existsUser.id, scope: Array(existsUser.role.name) }, "15m");
       await this.userRepository.update(
         { token },
         {
@@ -165,7 +182,7 @@ export class UserService {
           },
         }
       );
-
+/** 
       const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/changePassword/${existsUser.id}/${token}`;
 
       const subject: string = "Change Password";
@@ -174,27 +191,22 @@ export class UserService {
       <p>Change password</p>
       <a href=${url}>Change</a>
       </div>`;
-      await sendMail(existsUser.email, subject, message);
-
-      return ResponseParse(200, "Email sending");
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
+      await sendMail(existsUser.email, subject, message);*/
+      return new ResponseDTO("Email sent.");
+ 
   }
+  public async changePassword(id: number, password: string, token: string): Promise<ResponseDTO> {
 
-  public async changePassword(id: string, password: string, token: string) {
-    try {
       const existsUser = await this.userRepository.findOne({ where: { id } });
       // check if user exists
       if (!existsUser) {
-        return ResponseParse(404, "User not found");
+        throw new UserError("USER_NOT_FOUND", "User not found");
       }
 
       // compare tokens
       if (token !== existsUser.token) {
-        return ResponseParse(401, "Invalid user token");
+        throw new UserError("RECOVERY_TOKEN_INCORRECT", "Invalid recovery token");
       }
-
       const hPassword = await hashPassword(password);
       await this.userRepository.update(
         { token: "", password: hPassword },
@@ -204,16 +216,12 @@ export class UserService {
           },
         }
       );
-
-      return ResponseParse(200, "Password changed");
-    } catch (err: any) {
-      return ResponseParse(500, err.message);
-    }
+      return new ResponseDTO("Password changed");
   }
 
 
 
-  public async updateUser(id: string, user: UpdateUserDTO): Promise<ResponseDTO> {
+  public async updateUser(id: number, user: UpdateUserDTO): Promise<ResponseDTO> {
     const existsUser = await this.userRepository.findOne({ where: { id } });
     if (!existsUser) {
       throw new UserError("USER_NOT_FOUND", "User not found");
@@ -232,7 +240,7 @@ export class UserService {
 
 
 
-  public async deleteUser(id: string): Promise<ResponseDTO> {
+  public async deleteUser(id: number): Promise<ResponseDTO> {
     const existsUser = await this.userRepository.findOne({ where: { id } });
     if (!existsUser) {
       throw new UserError("USER_NOT_FOUND", "User not found");

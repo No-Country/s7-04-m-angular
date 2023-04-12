@@ -1,21 +1,22 @@
 import { HttpStatus } from "../utils/enum/http.status";
 import { ErrorBase } from "./ErrorBase";
 
-type TagErrorName =
-    | "TAG_NOT_FOUND"
-    | "TAG_ALREADY_EXISTS"
-    | "NO_TAGS_FOUND"
-    | "TAG_NAME_ERROR"
+type CategoryErrorName =
+    | "CATEGORY_NOT_FOUND"
+    | "CATEGORY_ALREADY_EXISTS"
+    | "NO_CATEGORIES_FOUND"
 
 
-export class TagError extends ErrorBase<TagErrorName> {
 
-    name: TagErrorName;
+
+export class CategoryError extends ErrorBase<CategoryErrorName> {
+
+    name: CategoryErrorName;
     message: string;
     status: number; 
     cause: any;
 
-    constructor(name: TagErrorName, message: string, cause?: any | Error) {
+    constructor(name: CategoryErrorName, message: string, cause?: any | Error) {
         super({ name, message, cause });
         this.name = name;
         this.status = this.handleErrorCode(name);
@@ -23,15 +24,13 @@ export class TagError extends ErrorBase<TagErrorName> {
         this.cause = cause;
     }
 
-    private handleErrorCode(name: TagErrorName): number {
+    private handleErrorCode(name: CategoryErrorName): number {
         switch(name) {
-            case "TAG_NOT_FOUND":
+            case "CATEGORY_NOT_FOUND":
                 return HttpStatus.NOT_FOUND;
-            case "TAG_NAME_ERROR":
-                return HttpStatus.BAD_REQUEST;
-            case "TAG_ALREADY_EXISTS":
+            case "CATEGORY_ALREADY_EXISTS":
                 return HttpStatus.CONFLICT;
-            case "NO_TAGS_FOUND":
+            case "NO_CATEGORIES_FOUND":
                 return HttpStatus.NOT_FOUND;
             default:
                 return HttpStatus.INTERNAL_SERVER_ERROR;

@@ -1,4 +1,4 @@
 export interface IUserRequest {
-  id: number;
-  role: string;
+  sub: number;
+  scope: string[];
 }
