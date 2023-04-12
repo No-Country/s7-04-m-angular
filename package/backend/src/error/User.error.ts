@@ -10,7 +10,8 @@ type UserErrorName =
     | "USER_NOT_AUTHORIZED"
     | "USER_NOT_ACTIVATED"
     | "USER_ALREADY_ACTIVATED"
-    | "USER_NOT_VERIFIED";
+    | "USER_NOT_VERIFIED"
+    | "RECOVERY_TOKEN_INCORRECT";
 
 
 
@@ -48,6 +49,8 @@ export class UserError extends ErrorBase<UserErrorName> {
             case "USERS_NOT_FOUND":
                 return HttpStatus.NOT_FOUND;
             case "USER_PASSWORD_INCORRECT":
+                return HttpStatus.UNAUTHORIZED;
+            case "RECOVERY_TOKEN_INCORRECT":
                 return HttpStatus.UNAUTHORIZED;
             default:
                 return HttpStatus.INTERNAL_SERVER_ERROR;

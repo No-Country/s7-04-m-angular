@@ -1,12 +1,13 @@
 import { Sequelize } from 'sequelize-typescript';
 import * as dotenv from 'dotenv';
-import { join } from 'path';
-
-// Configura la ubicación del archivo .env según el entorno
-const envPath = join(__dirname, `../../../.env.${process.env.NODE_ENV}`);
 
 // Carga las variables de entorno desde el archivo .env correspondiente
-dotenv.config({ path: envPath });
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: `.env.${process.env.NODE_ENV}`});
+} else {
+  dotenv.config();
+}
 
 const connection = new Sequelize({
     dialect:'mysql',
