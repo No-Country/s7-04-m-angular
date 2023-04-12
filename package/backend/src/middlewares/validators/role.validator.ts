@@ -32,3 +32,13 @@ export const deleteRoleV = [
         .withMessage("Id must be a number"),
     errorHandler
 ];
+
+export const getRoleByIdV = [
+    param("id")
+        .notEmpty()
+        .withMessage("Id is required")
+        .isNumeric()
+        .withMessage("Id must be a number")
+        .toInt(),
+    errorHandler
+];

@@ -12,9 +12,9 @@ const authRouter = Router();
 
 const controller = new UserController();
 
-authRouter.post("/login", loginValidate, controller.login);
-authRouter.post("/register", registerValidate, controller.registerUser);
-authRouter.post("/forgetPassword", forgetPasswordValidate, controller.forgetPassword);
-authRouter.post("/changePassword/:id", auth, compareIds, changePasswordValidate, controller.changePassword);
+authRouter.post("/login", loginValidate, controller.login.bind(controller));
+authRouter.post("/register", registerValidate, controller.registerUser.bind(controller));
+authRouter.post("/forgetPassword", forgetPasswordValidate, controller.forgetPassword.bind(controller));
+authRouter.post("/changePassword/:id", auth, compareIds, changePasswordValidate, controller.changePassword.bind(controller));
 
 export default authRouter;
