@@ -5,7 +5,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { HomeComponent } from './views/home/home.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },

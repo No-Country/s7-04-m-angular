@@ -1,0 +1,78 @@
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f2f2f2;
+}
+
+.left img {
+  height: 40px;
+}
+
+.center h3,
+.right h3 {
+  margin-bottom: 10px;
+}
+
+.center ul,
+.right ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.center li,
+.right li {
+  margin-bottom: 5px;
+}
+
+.center a,
+.right a {
+  color: #333;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.center a i,
+.right a i {
+  margin-right: 5px;
+  font-size: 18px;
+}
+
+.center li:nth-child(1) a:before {
+  content: "\f0e0"; /* Icono del sobre */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 400;
+  margin-right: 5px;
+  color: #333;
+}
+
+.center li:nth-child(2) a:before {
+  content: "\f232"; /* Icono de WhatsApp */
+  font-family: "Font Awesome 5 Fab";
+  font-weight: 400;
+  margin-right: 5px;
+  color: #333;
+}
+
+.center li:nth-child(3) a:before {
+  content: "\f16d"; /* Icono de Instagram */
+  font-family: "Font Awesome 5 Fab";
+  font-weight: 400;
+  margin-right: 5px;
+  color: #333;
+}
+
+.bottom {
+  text-align: center;
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+}
+
+.bottom p {
+  margin: 0;
+  font-size: 14px;
+}
