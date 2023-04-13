@@ -1,1 +1,7 @@
-<app-card></app-card>
+<div class="container">
+  <div *ngFor="let dato of data">
+    <div class="card">
+      <app-card [datos]="dato"></app-card>
+    </div>
+  </div>
+</div>
