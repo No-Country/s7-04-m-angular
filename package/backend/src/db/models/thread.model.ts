@@ -30,6 +30,9 @@ export class Thread extends Model<Thread> {
     @BelongsToMany(()=>Reply,()=>ReplyThread)
     replies: Reply[];
     
+    @BelongsTo(() => Category)
+    category: Category;
+    
     @BelongsTo(() => User)
     user: User;
 }

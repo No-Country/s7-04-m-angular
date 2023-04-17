@@ -1,12 +1,16 @@
-import { Expose } from "class-transformer";
+import { Expose,Type} from "class-transformer";
+import { UserSimpleDTO } from "../user/user.simple.dto";
 
 export class ReplyDTO {
   @Expose()
   id: number;
   @Expose()
-  content: string;
+  body: string;
   @Expose()
-  userId: number;
+  userId?: number;
+  @Type(() => UserSimpleDTO)
+  @Expose()
+  user: UserSimpleDTO;
   @Expose()
   threadId: number;
   @Expose()

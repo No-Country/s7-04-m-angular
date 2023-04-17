@@ -8,6 +8,16 @@ import { ResponseDTO } from "../dto/general/response.dto";
 import { Tag } from "../db/models/tag.model";
 import sequelize from '../db/config/db.config'
 import { Category } from "../db/models/category.model";
+import { User } from "../db/models/user.model";
+import { Reply } from "../db/models/reply.model";
+import { ThreadError } from "../error/Thread.error";
+import { TagError } from "../error/Tag.error";
+import { ThreadUpdateDTO } from "../dto/thread/Request/thread.update.dto";
+import { IUserRequest } from "../Types/IUserRequest";
+import { Role } from "../db/models/role.model";
+import { Includeable } from "sequelize";
+import { IFilterOptions } from "../Types/IFilterOptions";
+
 
 
 export class ThreadService {
@@ -16,37 +26,89 @@ export class ThreadService {
     private readonly tagRepo: Repository<Tag>;
     private readonly categoryRepo: Repository<Category>;
     private readonly paginator: Paginator<Thread>;
+    private readonly userRepo: Repository<User>;
+    private readonly replyRepo: Repository<Reply>;
+    private readonly roleRepo: Repository<Role>;
 
     constructor() {
         this.threadRepo = sequelize.getRepository(Thread);
         this.tagRepo = sequelize.getRepository(Tag);
+        this.userRepo = sequelize.getRepository(User);
         this.categoryRepo = sequelize.getRepository(Category);
+        this.replyRepo = sequelize.getRepository(Reply);
+        this.roleRepo = sequelize.getRepository(Role);
         this.paginator = new Paginator(this.threadRepo);
-       
+
     }
 
     public async createThread(thread: ThreadCreateDTO): Promise<Thread> {
 
         //Check if tag exists
-        const tags = await this.tagRepo.findAll({ where: { name: thread.tags.map(tag => tag) } });
-     
+        const tagsarr = thread.tags.map(tag => tag)
+        const tags = await this.tagRepo.findAll({ where: { name: tagsarr } });
 
+        if (tags.length !== thread.tags.length) {
+            throw new TagError("TAG_NOT_FOUND", "One or more tags passed not found. If you want to create a new tag, please use tag create endpoint.");
+        }
 
         const newThread = await this.threadRepo.create({
             title: thread.title,
             content: thread.content,
             userId: thread.userId,
             categoryId: thread.categoryId,
-        });
 
+        },{ include:[this.tagRepo]});
+
+       
         await newThread.$set('tags', tags);
 
-        return newThread;
+        await newThread.reload({include:[this.tagRepo,this.userRepo,this.categoryRepo]});
+       // const response = await this.threadRepo.findOne({ where: { id: newThread.id }, include: [this.tagRepo, this.userRepo, this.categoryRepo] });
+        return newThread
+    }
+
+    public async getThreadById(id: number): Promise<Thread> {
+        const thread = await this.threadRepo.findOne({ where: { id }, include: [this.tagRepo, {model:this.userRepo,include:[this.roleRepo]}, this.replyRepo, this.categoryRepo] });
+        if(!thread){
+            throw new ThreadError("THREAD_NOT_FOUND","Thread not found.")
+        }
+        return thread;
+    }
+
+    
+    private setFilters(options:IFilterOptions): Includeable[] {
+        const filterOpt = [];
+        if (options.category) {
+           filterOpt[0] =  {model:this.categoryRepo, where:{name:options.category}};
+        }else{
+            filterOpt[0] =  {model:this.categoryRepo};
+        }
+
+        if (options.author) {
+            filterOpt[1] =  {model:this.userRepo, where:{nickname:options.author},include:[this.roleRepo]};
+        }else{
+            filterOpt[1] =  {model:this.userRepo,include:[this.roleRepo]};
+        }
+
+       
+        return filterOpt;
+    }
+
+    public async getThreadsByActivityAndFilters(page = 1, limit = 10, options?:IFilterOptions): Promise<IPaginated<Thread>> {
+
+        const filterOpt = this.setFilters(options)
+        let threads: IPaginated<Thread>;
+        if (Object.keys(filterOpt).length > 0) {
+            threads = await this.paginator.paginate({ order: [['updatedAt', 'DESC']], include: [this.tagRepo, ...filterOpt] }, page, limit);
+        } else {
+            threads = await this.paginator.paginate({ order: [['updatedAt', 'DESC']], include: [this.tagRepo, {model:this.userRepo,include:[this.roleRepo]}, this.categoryRepo] }, page, limit);
+        }
+        return threads
     }
 
 
     public async getThreadsByActivity(page = 1, limit = 10): Promise<IPaginated<Thread>> {
-        const threads = await this.paginator.paginate({ order: [['updatedAt', 'DESC']], include:[this.tagRepo]}, page, limit);
+        const threads = await this.paginator.paginate({ order: [['updatedAt', 'DESC']], include: [this.tagRepo, this.userRepo, this.categoryRepo] }, page, limit);
         return threads;
     }
 
@@ -60,18 +122,44 @@ export class ThreadService {
         return threads;
     }
 
-    public async getThreadById(id: number): Promise<Thread> {
-        const thread = await this.threadRepo.findOne({ where: { id } });
-        return thread;
+    public async updateThread(id: number, thread: ThreadUpdateDTO, userId: number): Promise<ResponseDTO> {
+
+        const threadToUpdate = await this.threadRepo.findOne({ where: { id } });
+        if (!threadToUpdate) {
+            throw new ThreadError("THREAD_NOT_FOUND", "Thread not found.");
+        }
+        if (threadToUpdate.userId !== userId) {
+            throw new ThreadError("THREAD_NOT_OWNER", "You are not the owner of this thread.");
+        }
+
+        const tags = await this.tagRepo.findAll({ where: { name: thread.tags.map(tag => tag) } });
+
+        if (tags.length !== thread.tags.length) {
+            throw new TagError("TAG_NOT_FOUND", "One or more tags passed not found. If you want to create a new tag, please use tag create endpoint.");
+        }
+
+        await threadToUpdate.update({
+            title: thread.title,
+            content: thread.content,
+            categoryId: thread.categoryId,
+
+        })
+
+        await threadToUpdate.$set("tags", tags)
+
+        return new ResponseDTO("Thread Updated.");
     }
 
- /*   public async updateThread(id: number, thread: ThreadCreateDTO): Promise<ResponseDTO> {
-        await this.threadRepo.update(thread, { where: { id } });
-        return new ResponseDTO("Thread Updated.");
-    }*/
-
-    public async deleteThread(id: number): Promise<ResponseDTO> {
-        await this.threadRepo.destroy({ where: { id } });
+    public async deleteThread(id: number,user:IUserRequest): Promise<ResponseDTO> {
+        const threadToDelete = await this.threadRepo.findOne({ where: { id } });
+        if (!threadToDelete) {
+            throw new ThreadError("THREAD_NOT_FOUND", "Thread not found.");
+        }
+        if (threadToDelete.userId !== user.sub || !user.scope.includes("admin")) {
+            throw new ThreadError("THREAD_NOT_OWNER", "You are not the owner of this thread.");
+        }
+        
+        await threadToDelete.destroy();
         return new ResponseDTO("Thread Deleted.");
     }
 

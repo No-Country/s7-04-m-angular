@@ -119,77 +119,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserDTO": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"nickname": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"image": {
-						"type": "string"
-					},
-					"token": {
-						"type": "string"
-					},
-					"isValid": {
-						"type": "boolean"
-					},
-					"roleId": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"id",
-					"nickname",
-					"email",
-					"password",
-					"image",
-					"token",
-					"isValid",
-					"roleId"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CategoryDTO": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"id",
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CategoryCreateDTO": {
-				"properties": {
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"RoleDTO": {
 				"properties": {
 					"id": {
@@ -203,6 +132,176 @@
 				"required": [
 					"id",
 					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"nickname": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"image": {
+						"type": "string"
+					},
+					"isValid": {
+						"type": "boolean"
+					},
+					"roleId": {
+						"type": "number",
+						"format": "double"
+					},
+					"role": {
+						"$ref": "#/components/schemas/RoleDTO"
+					}
+				},
+				"required": [
+					"id",
+					"nickname",
+					"email",
+					"image",
+					"isValid",
+					"roleId",
+					"role"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CategoryDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"imageURL": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"imageURL"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CategoryCreateDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"imageURL": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"imageURL"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserSimpleDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"nickname": {
+						"type": "string"
+					},
+					"role": {
+						"$ref": "#/components/schemas/RoleDTO"
+					}
+				},
+				"required": [
+					"id",
+					"nickname",
+					"role"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ReplyDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"body": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"user": {
+						"$ref": "#/components/schemas/UserSimpleDTO"
+					},
+					"threadId": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"id",
+					"body",
+					"user",
+					"threadId",
+					"createdAt",
+					"updatedAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RepliesPaginatedDTO": {
+				"properties": {
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/ReplyDTO"
+						},
+						"type": "array"
+					},
+					"lastPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalRecords": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"hasMorePages": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"data",
+					"lastPage",
+					"totalRecords",
+					"currentPage",
+					"hasMorePages"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -225,6 +324,75 @@
 				"required": [
 					"message",
 					"details"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateReplyDTO": {
+				"properties": {
+					"body": {
+						"type": "string"
+					},
+					"threadId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"body",
+					"threadId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PermissionErrorName": {
+				"type": "string",
+				"enum": [
+					"INSUFFICIENT_PERMISSIONS",
+					"ONLY_OWNER_OR_ADMIN"
+				]
+			},
+			"Error": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"stack": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PermissionError": {
+				"properties": {
+					"name": {
+						"$ref": "#/components/schemas/PermissionErrorName"
+					},
+					"message": {
+						"type": "string"
+					},
+					"stack": {
+						"type": "string"
+					},
+					"cause": {},
+					"status": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"name",
+					"message",
+					"status",
+					"cause"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -282,17 +450,15 @@
 					"content": {
 						"type": "string"
 					},
-					"userId": {
-						"type": "number",
-						"format": "double"
+					"category": {
+						"$ref": "#/components/schemas/CategoryDTO"
 					},
-					"categoryId": {
-						"type": "number",
-						"format": "double"
+					"user": {
+						"$ref": "#/components/schemas/UserDTO"
 					},
 					"tags": {
 						"items": {
-							"$ref": "#/components/schemas/TagDTO"
+							"type": "string"
 						},
 						"type": "array"
 					},
@@ -309,8 +475,8 @@
 					"id",
 					"title",
 					"content",
-					"userId",
-					"categoryId",
+					"category",
+					"user",
 					"tags",
 					"createdAt",
 					"updatedAt"
@@ -634,7 +800,7 @@
 				"parameters": []
 			}
 		},
-		"/api/v1/category": {
+		"/api/v1/categories": {
 			"get": {
 				"operationId": "GetAll",
 				"responses": {
@@ -701,7 +867,7 @@
 				}
 			}
 		},
-		"/api/v1/category/{id}": {
+		"/api/v1/categories/{id}": {
 			"put": {
 				"operationId": "Update",
 				"responses": {
@@ -782,6 +948,254 @@
 					{
 						"in": "path",
 						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/replies/by-thread/{threadId}": {
+			"get": {
+				"operationId": "GetRepliesByThread",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RepliesPaginatedDTO"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "This thread has no replies"
+					}
+				},
+				"tags": [
+					"Reply"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "threadId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/replies/by-user/{userId}": {
+			"get": {
+				"operationId": "GetRepliesByUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RepliesPaginatedDTO"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "This user has no replies"
+					}
+				},
+				"tags": [
+					"Reply"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/replies": {
+			"post": {
+				"operationId": "CreateReply",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReplyDTO"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReplyDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation Error"
+					},
+					"422": {
+						"description": "Validation Failed",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IValidateErrorJSON"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reply"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateReplyDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/replies/{replyId}": {
+			"put": {
+				"operationId": "UpdateReply",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReplyDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation Error"
+					},
+					"403": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PermissionError"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Reply not found"
+					},
+					"422": {
+						"description": "Validation Failed: some fields is not present",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IValidateErrorJSON"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reply"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "replyId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateReplyDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteReply",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PermissionError"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Reply not found"
+					}
+				},
+				"tags": [
+					"Reply"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "replyId",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -1189,7 +1603,7 @@
 				]
 			}
 		},
-		"/api/v1/thread": {
+		"/api/v1/threads": {
 			"get": {
 				"operationId": "GetAll",
 				"responses": {
@@ -1202,6 +1616,9 @@
 								}
 							}
 						}
+					},
+					"404": {
+						"description": "No threads found"
 					}
 				},
 				"tags": [
@@ -1226,6 +1643,22 @@
 							"format": "double",
 							"type": "number"
 						}
+					},
+					{
+						"in": "query",
+						"name": "category",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "author",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -1241,6 +1674,15 @@
 								}
 							}
 						}
+					},
+					"201": {
+						"description": "Success"
+					},
+					"400": {
+						"description": "Validation Error"
+					},
+					"422": {
+						"description": "Validation Failed"
 					}
 				},
 				"tags": [
@@ -1260,6 +1702,123 @@
 						}
 					}
 				}
+			}
+		},
+		"/api/v1/threads/{id}": {
+			"get": {
+				"operationId": "GetOne",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ThreadDTO"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Thread"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Thread not owner error"
+					},
+					"404": {
+						"description": "Thread not found error"
+					}
+				},
+				"tags": [
+					"Thread"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ResponseDTO"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Thread not owner error"
+					}
+				},
+				"tags": [
+					"Thread"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/api/v1/users": {

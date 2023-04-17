@@ -12,5 +12,10 @@ export class CategoryDTO {
     @Expose()
     name: string;
 
+    @IsNotEmpty()
+    @IsString()
+    @Expose()
+    imageURL: string;
+
 
 }

@@ -5,16 +5,21 @@ import { ResponseDTO } from "../dto/general/response.dto";
 import { ReplyError } from "../error/Reply.error";
 import Paginator from "../utils/paginator";
 import { IPaginated } from "../interfaces/IPaginated";
+import { IUserRequest } from "../Types/IUserRequest";
+import { PermissionError } from "../error/Permission.error";
+import { User } from "../db/models/user.model";
 
 export class ReplyService {
 
     private readonly repo: Repository<Reply>;
     private readonly paginator: Paginator<Reply>;
+    private readonly userRepo: Repository<User>;
 
 
     constructor(sequelize: Sequelize) {
         this.repo = sequelize.getRepository(Reply);
         this.paginator = new Paginator(this.repo);
+        this.userRepo = sequelize.getRepository(User);
     }
 
 
@@ -28,33 +33,51 @@ export class ReplyService {
     }
 
     public async getRepliesByThreadId(threadId: number, page = 1, limit = 10): Promise<IPaginated<Reply>> {
-        const replies = this.paginator.paginate({ where: { threadId } }, page, limit)
-        if (!replies) {
-            throw new ReplyError("NO_REPLIES_FOUND", "This thread has no replies");
+        const replies = this.paginator.paginate({ where: { threadId },attributes:["id","body","threadId","createdAt","updatedAt"],include:[this.userRepo]}, page, limit)
+        if ((await replies).totalRecords === 0) {
+            throw new ReplyError("NO_REPLIES_FOUND", "This thread doesn't exist or has no replies yet");
         }
         return replies;
     }
 
-    public async createReply(reply: CreateReplyDTO): Promise<Reply> {
-        const res = await this.repo.create(reply);
+    public async getRepliesByUser(userId: number, page = 1, limit = 10): Promise<IPaginated<Reply>> {
+        const replies = this.paginator.paginate({ where: { userId },attributes:["id","body","threadId","createdAt","updatedAt"],include:[this.userRepo] }, page, limit)
+        if ((await replies).totalRecords === 0) {
+            throw new ReplyError("NO_REPLIES_FOUND", "This user doesn't exist or has no replies yet");
+        }
+        return replies;
+    }
+
+    public async createReply(reply: CreateReplyDTO, userId:number): Promise<Reply> {
+        const rep = { ...reply, userId: userId}
+        const res = await this.repo.create(rep);
         return res;
     }
 
 
-    public async updateReply(id: number, reply: CreateReplyDTO): Promise<Reply> {
+    public async updateReply(id: number, reply: CreateReplyDTO, user:IUserRequest): Promise<Reply> {
         const existsReply = await this.repo.findOne({ where: { id } });
         if (!existsReply) {
             throw new ReplyError("REPLY_NOT_FOUND", "Reply not found");
+        }
+        //Verify if user is the owner of the reply or is an admin
+        if (user.sub !== existsReply.userId || !user.scope.includes("admin")) {
+            throw new PermissionError("ONLY_OWNER_OR_ADMIN", "You don't have permission to update this reply");
         }
         const updated = await existsReply.update(reply, { where: { id } });
         return updated;
 
     }
 
-    public async deleteReply(id: number): Promise<ResponseDTO> {
+    public async deleteReply(id: number, user:IUserRequest): Promise<ResponseDTO> {
         const existsReply = await this.repo.findOne({ where: { id } });
         if (!existsReply) {
             throw new ReplyError("REPLY_NOT_FOUND", "Reply not found");
+        }
+
+        //Verify if user is the owner of the reply or is an admin
+        if (user.sub !== existsReply.userId || !user.scope.includes("admin")) {
+            throw new PermissionError("ONLY_OWNER_OR_ADMIN", "You don't have permission to delete this reply");
         }
         await this.repo.destroy({ where: { id } });
         return new ResponseDTO("Reply deleted");

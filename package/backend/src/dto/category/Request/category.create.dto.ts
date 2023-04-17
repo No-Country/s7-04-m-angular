@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class CategoryCreateDTO {
@@ -7,5 +7,11 @@ export class CategoryCreateDTO {
     @IsString()
     @Expose()
     name: string;
+
+
+    @IsOptional()
+    @IsString()
+    @Expose()
+    imageURL: string;
 
 }

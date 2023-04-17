@@ -9,6 +9,9 @@ export class Category extends Model<Category> {
     @Column
     name: string;
 
+    @Column
+    imageURL:string;
+
     @HasMany(() => Thread)
     threads: Thread[];
 
