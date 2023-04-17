@@ -22,9 +22,11 @@ export class UserService {
   private readonly roleRepository: Repository<Role>;
   private readonly jwtService: JWTService;
   private readonly paginator: Paginator<User>;
+  private readonly sequelize: Sequelize;
 
   constructor(sequelize: Sequelize) {
     this.jwtService = new JWTService();
+    this.sequelize = sequelize;
     this.userRepository = sequelize.getRepository(User);
     this.roleRepository = sequelize.getRepository(Role);
     this.paginator = new Paginator(this.userRepository);
@@ -71,21 +73,25 @@ export class UserService {
 
 
   public async createUser(user: CreateUserDTO): Promise<User> {
-    const existsUser = await this.userRepository.findOne({ where: { email: user.email } });
-    if (existsUser) {
-      throw new UserError("USER_ALREADY_EXISTS", "User already exists");
-    }
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+      const existsUser = await this.userRepository.findOne({ where: { email: user.email }, transaction: t });
+      if (existsUser) {
+        throw new UserError("USER_ALREADY_EXISTS", "User already exists");
+      }
 
-    user.password = await hashPassword(user.password);
-    const newUser = await this.userRepository.create(user);
-    return newUser;
+      user.password = await hashPassword(user.password);
+      const newUser = await this.userRepository.create(user, { transaction: t });
+      return newUser;
+
+    });
+    return transactionResult;
   }
 
-    
+
 
 
   public async getMe(id: number): Promise<User> {
-    const existsUser = await this.userRepository.findOne({ where: { id }, include:[this.roleRepository]}  );
+    const existsUser = await this.userRepository.findOne({ where: { id }, include: [this.roleRepository] });
     if (!existsUser) {
       throw new UserError("USER_NOT_FOUND", "User not found");
     }
@@ -138,37 +144,41 @@ export class UserService {
    * */
   public async register(user: RegisterUserDTO): Promise<User> {
 
- 
-    
-    const existsUser = await this.userRepository.findOne({ where: {[Op.or]: [{ email: user.email }, { nickname: user.nickname }]},paranoid:false });
-    if (existsUser) {
-      throw new UserError("USER_ALREADY_EXISTS", "The email or nickname already exists");
-    }
-    const hPassword = await hashPassword(user.password);
-    const data = { ...user, password: hPassword, roleId: 1, isValid: true };
-    const newUser = await this.userRepository.create(data);
+    const transactionResult = await this.sequelize.transaction(async (t) => {
 
-    /* //Validar cuenta
-      const token = this.jwtService.sign({ id: newUser.id, role: "user" });
-      await this.userRepository.update({ token }, { where: { id: newUser.id } });
-      const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/validateAccount/${newUser.id}/${token}`;
-      const subject: string = "Activate Account";
-      const message: string = `
-      <div>
-      <p>Active account</p>
-      <a href=${url}>Validate</a>
-      </div>`;
-      await sendMail(user.email, subject, message);*/
-    return newUser;
- 
+      const existsUser = await this.userRepository.findOne({ where: { [Op.or]: [{ email: user.email }, { nickname: user.nickname }] }, paranoid: false, transaction: t });
+      if (existsUser) {
+        throw new UserError("USER_ALREADY_EXISTS", "The email or nickname already exists");
+      }
+      const hPassword = await hashPassword(user.password);
+      const data = { ...user, password: hPassword, roleId: 1, isValid: true };
+      const newUser = await this.userRepository.create(data, { transaction: t });
+
+      /* //Validar cuenta
+        const token = this.jwtService.sign({ id: newUser.id, role: "user" });
+        await this.userRepository.update({ token }, { where: { id: newUser.id } });
+        const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/validateAccount/${newUser.id}/${token}`;
+        const subject: string = "Activate Account";
+        const message: string = `
+        <div>
+        <p>Active account</p>
+        <a href=${url}>Validate</a>
+        </div>`;
+        await sendMail(user.email, subject, message);*/
+      return newUser;
+    });
+
+    return transactionResult;
 
   }
 
 
   public async forgetPassword(email: string): Promise<ResponseDTO> {
+    const transactionResult = await this.sequelize.transaction(async (t) => {
       const existsUser = await this.userRepository.findOne({
         where: { email },
         include: [this.roleRepository],
+        transaction: t
       });
       if (!existsUser) {
         throw new UserError("USER_NOT_FOUND", "User not found");
@@ -180,24 +190,29 @@ export class UserService {
           where: {
             id: existsUser.id,
           },
+          transaction: t
         }
       );
-/** 
-      const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/changePassword/${existsUser.id}/${token}`;
-
-      const subject: string = "Change Password";
-      const message: string = `
-      <div>
-      <p>Change password</p>
-      <a href=${url}>Change</a>
-      </div>`;
-      await sendMail(existsUser.email, subject, message);*/
+      /** 
+            const url: string = `${process.env.FRONT_URL || "http://localhost:5173"}/changePassword/${existsUser.id}/${token}`;
+      
+            const subject: string = "Change Password";
+            const message: string = `
+            <div>
+            <p>Change password</p>
+            <a href=${url}>Change</a>
+            </div>`;
+            await sendMail(existsUser.email, subject, message);*/
       return new ResponseDTO("Email sent.");
- 
+    });
+    return transactionResult;
+
   }
   public async changePassword(id: number, password: string, token: string): Promise<ResponseDTO> {
 
-      const existsUser = await this.userRepository.findOne({ where: { id } });
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+
+      const existsUser = await this.userRepository.findOne({ where: { id }, transaction: t });
       // check if user exists
       if (!existsUser) {
         throw new UserError("USER_NOT_FOUND", "User not found");
@@ -214,58 +229,73 @@ export class UserService {
           where: {
             id,
           },
+          transaction: t
         }
       );
       return new ResponseDTO("Password changed");
+    });
+    return transactionResult;
   }
 
 
 
   public async updateUser(id: number, user: UpdateUserDTO): Promise<ResponseDTO> {
-    const existsUser = await this.userRepository.findOne({ where: { id } });
-    if (!existsUser) {
-      throw new UserError("USER_NOT_FOUND", "User not found");
-    }
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+      const existsUser = await this.userRepository.findOne({ where: { id }, transaction: t });
+      if (!existsUser) {
+        throw new UserError("USER_NOT_FOUND", "User not found");
+      }
 
-    if(user.password && (user.password != existsUser.password)){
-      const hPassword = await hashPassword(user.password);
-      const data = { ...user, password: hPassword };
-      await this.userRepository.update(data, { where: { id } });
-    }else{
-      await this.userRepository.update(user, { where: { id } });
-    }
-    
-    return new ResponseDTO("User updated");
+      if (user.password && (user.password != existsUser.password)) {
+        const hPassword = await hashPassword(user.password);
+        const data = { ...user, password: hPassword };
+        await this.userRepository.update(data, { where: { id }, transaction: t });
+      } else {
+        await this.userRepository.update(user, { where: { id }, transaction: t });
+      }
+
+      return new ResponseDTO("User updated");
+    });
+    return transactionResult;
   }
 
 
 
   public async deleteUser(id: number): Promise<ResponseDTO> {
-    const existsUser = await this.userRepository.findOne({ where: { id } });
-    if (!existsUser) {
-      throw new UserError("USER_NOT_FOUND", "User not found");
-    }
-    await this.userRepository.destroy({ where: { id } });
-    return new ResponseDTO("User deleted");
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+      const existsUser = await this.userRepository.findOne({ where: { id }, transaction: t });
+      if (!existsUser) {
+        throw new UserError("USER_NOT_FOUND", "User not found");
+      }
+      await this.userRepository.destroy({ where: { id }, transaction: t });
+      return new ResponseDTO("User deleted");
+    });
+    return transactionResult;
   }
 
 
-  public async restoreUserbyId(id:number): Promise<ResponseDTO> {
-    const existsUser = await this.userRepository.findOne({ where: { id },paranoid:false }, );
-    if (!existsUser) {
-      throw new UserError("USER_NOT_FOUND", "User not found");
-    }
-    await this.userRepository.update({ deletedAt: null }, { where: { id } });
-    return new ResponseDTO("User restored");
+  public async restoreUserbyId(id: number): Promise<ResponseDTO> {
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+      const existsUser = await this.userRepository.findOne({ where: { id }, paranoid: false, transaction: t },);
+      if (!existsUser) {
+        throw new UserError("USER_NOT_FOUND", "User not found");
+      }
+      await this.userRepository.update({ deletedAt: null }, { where: { id }, transaction: t });
+      return new ResponseDTO("User restored");
+    });
+    return transactionResult;
   }
 
-  public async restoreUserbyEmail(email:string): Promise<ResponseDTO> {
-    const existsUser = await this.userRepository.findOne({ where: { email },paranoid:false }, );
-    if (!existsUser) {
-      throw new UserError("USER_NOT_FOUND", "User not found");
-    }
-    await this.userRepository.update({ deletedAt: null }, { where: { email } });
-    return new ResponseDTO("User restored");
+  public async restoreUserbyEmail(email: string): Promise<ResponseDTO> {
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+      const existsUser = await this.userRepository.findOne({ where: { email }, paranoid: false, transaction: t },);
+      if (!existsUser) {
+        throw new UserError("USER_NOT_FOUND", "User not found");
+      }
+      await this.userRepository.update({ deletedAt: null }, { where: { email }, transaction: t });
+      return new ResponseDTO("User restored");
+    });
+    return transactionResult;
   }
 
 
