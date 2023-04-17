@@ -6,9 +6,13 @@ header {
   padding: 0 20px;
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
 }
 
 .logo img {
+  flex: none;
+  order: 0;
+  flex-grow: 0;
   height: 40px;
   margin-left: 20px;
 }
@@ -33,14 +37,15 @@ nav a {
 .buttons button {
   margin-left: 10px;
   padding: 10px 20px;
-  background-color: #333;
-  color: #fff;
+  color: #0e0101;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.1);
+  font-weight: 700;
 }
 
 .buttons button:hover {
-  background-color: #555;
+  background: #ff4600;
 }

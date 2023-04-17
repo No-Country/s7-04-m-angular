@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ResourcesService {
-  private url = 'http://localhost:3000/topic';
+  private url =
+    'http://s7-04-backend-dev.us-east-1.elasticbeanstalk.com/api/v1/category';
 
   constructor(private http: HttpClient) {}
 

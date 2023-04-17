@@ -12,7 +12,7 @@
             placeholder="email"
           />
         </div>
-        
+
         <div class="form-field">
           <label>Password:</label>
           <input
@@ -24,7 +24,11 @@
         </div>
       </fieldset>
       <div class="form-buttons">
-        <button type="submit" class="button button-primary" (click)="login()">
+        <button
+          type="submit"
+          class="button button-primary"
+          (click)="loginSubmit()"
+        >
           Login
         </button>
       </div>

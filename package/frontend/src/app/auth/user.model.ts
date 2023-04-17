@@ -4,5 +4,5 @@ export interface User {
   email: string;
   password: string;
   expiresIn: number;
-  idToken: string;
+  token: string;
 }

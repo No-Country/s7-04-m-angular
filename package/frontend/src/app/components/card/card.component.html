@@ -1,4 +1,8 @@
-<mat-card class="example-card">
-  <mat-card-title>{{ datos.name }} </mat-card-title>
-  <img mat-card-image [src]="datos.image" alt="imagen de {{ datos.name }}" />
+<mat-card class="subject-card">
+  <img
+    mat-card-image
+    class="card-image"
+    [src]="'../../../assets/images/' + datos.id + '.png'"
+    alt="{{ datos.name }}"
+  />
 </mat-card>
