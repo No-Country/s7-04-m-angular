@@ -7,9 +7,11 @@ import { ResponseDTO } from "../dto/general/response.dto";
 export class CategoryService {
 
     private readonly repo: Repository<Category>;
+    private readonly sequelize: Sequelize;
 
     constructor(sequelize: Sequelize) {
         this.repo = sequelize.getRepository(Category);
+        this.sequelize = sequelize;
     }
 
     public async getAll(): Promise<Category[]> {
@@ -29,52 +31,63 @@ export class CategoryService {
     }
 
     public async create(category: CategoryCreateDTO): Promise<Category> {
+        const transactionResult = await this.sequelize.transaction(async (t) => {
 
-        const [newCategory, created] = await this.repo.findOrCreate({
-            where: {
-                name: category.name
-            },
-            defaults: {
-                name: category.name
+            const [newCategory, created] = await this.repo.findOrCreate({
+                where: {
+                    name: category.name
+                },
+                defaults: {
+                    name: category.name
 
+                },
+                transaction: t
+
+            });
+
+            if (!created) {
+                throw new CategoryError("CATEGORY_ALREADY_EXISTS", "Category already exists");
             }
+
+            return newCategory;
         });
-
-        if (!created) {
-            throw new CategoryError("CATEGORY_ALREADY_EXISTS", "Category already exists");
-        }
-
-        return newCategory;
+        return transactionResult;
     }
 
 
     public async update(id: number, category: CategoryCreateDTO): Promise<ResponseDTO> {
-        try {
-            const existsCategory = await this.repo.findOne({ where: { id } });
-            if (!existsCategory) {
-                throw new CategoryError("CATEGORY_NOT_FOUND", "Category not found");
-            }
+        const transactionResult = await this.sequelize.transaction(async (t) => {
+            try {
+                const existsCategory = await this.repo.findOne({ where: { id }, transaction: t });
+                if (!existsCategory) {
+                    throw new CategoryError("CATEGORY_NOT_FOUND", "Category not found");
+                }
 
-            await this.repo.update(category, { where: { id } });
+                await this.repo.update(category, { where: { id }, transaction: t });
 
-            return new ResponseDTO("Category Updated.");
-        } catch (err: any) {
-            if (err.name == "SequelizeUniqueConstraintError") {
-                throw new CategoryError("CATEGORY_ALREADY_EXISTS", `Category with name ${category.name} already exists`);
+                return new ResponseDTO("Category Updated.");
+            } catch (err: any) {
+                if (err.name == "SequelizeUniqueConstraintError") {
+                    throw new CategoryError("CATEGORY_ALREADY_EXISTS", `Category with name ${category.name} already exists`);
+                }
+                throw err;
             }
-            throw err;
-        }
+        });
+        return transactionResult;
 
     }
 
 
     public async delete(id: number): Promise<ResponseDTO> {
-        const existsCategory = await this.repo.findOne({ where: { id } });
-        if (!existsCategory) {
-            throw new CategoryError("CATEGORY_NOT_FOUND", "Category not found");
-        }
-        await this.repo.destroy({ where: { id } });
-        return new ResponseDTO("Category deleted");
+        const transactionResult = await this.sequelize.transaction(async (t) => {
+            const existsCategory = await this.repo.findOne({ where: { id }, transaction: t });
+            if (!existsCategory) {
+                throw new CategoryError("CATEGORY_NOT_FOUND", "Category not found");
+            }
+            await this.repo.destroy({ where: { id }, transaction: t });
+            return new ResponseDTO("Category deleted");
+        });
+        return transactionResult;
     }
 
 

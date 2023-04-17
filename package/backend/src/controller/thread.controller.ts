@@ -22,7 +22,7 @@ export class ThreadController extends Controller {
 
     constructor() {
         super();
-        this.threadService = new ThreadService();
+        this.threadService = new ThreadService(sequelize);
         
     }
 

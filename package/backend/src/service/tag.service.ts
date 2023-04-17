@@ -8,9 +8,11 @@ import { ResponseDTO } from '../dto/general/response.dto';
 
 export class TagService {
     private tagRepo: Repository<Tag>;
+    private sequelize: Sequelize;
 
     constructor(sequelize: Sequelize) {
         this.tagRepo = sequelize.getRepository(Tag);
+        this.sequelize = sequelize;
     }
 
     public async getAllTags(): Promise<Tag[]> {
@@ -40,41 +42,50 @@ export class TagService {
 
     public async createTag(tag: TagCreateDTO): Promise<Tag> {
 
-        //Validate tag
-        if (tag.name.split(' ').length > 1) {
-            throw new TagError("TAG_NAME_ERROR", "Tag name cannot contain spaces");
-        }
-        const existsTag = await this.tagRepo.findOne({ where: { name: tag.name } });
-        if (existsTag) {
-            throw new TagError("TAG_ALREADY_EXISTS", "Tag already exists");
-        }
-        const newTag = await this.tagRepo.create(tag);
-        return newTag;
+        const transactionRes = await this.sequelize.transaction(async (t) => {
+            //Validate tag
+            if (tag.name.split(' ').length > 1) {
+                throw new TagError("TAG_NAME_ERROR", "Tag name cannot contain spaces");
+            }
+            const existsTag = await this.tagRepo.findOne({ where: { name: tag.name } });
+            if (existsTag) {
+                throw new TagError("TAG_ALREADY_EXISTS", "Tag already exists");
+            }
+            const newTag = await this.tagRepo.create(tag, { transaction: t });
+            return newTag;
+        });
+        return transactionRes;
     }
 
     public async updateTag(id: number, tag: TagCreateDTO): Promise<ResponseDTO> {
+        const transactionResult = await this.sequelize.transaction(async (t) => {
 
-        if (tag.name.split(' ').length > 1) {
-            throw new TagError("TAG_NAME_ERROR", "Tag name cannot contain spaces");
-        }
+            if (tag.name.split(' ').length > 1) {
+                throw new TagError("TAG_NAME_ERROR", "Tag name cannot contain spaces");
+            }
 
-        const existsTag = await this.tagRepo.findOne({ where: { id } });
-        if (!existsTag) {
-            throw new TagError("TAG_NOT_FOUND", "Tag not found");
-        }
+            const existsTag = await this.tagRepo.findOne({ where: { id }, transaction: t });
+            if (!existsTag) {
+                throw new TagError("TAG_NOT_FOUND", "Tag not found");
+            }
 
 
-        await this.tagRepo.update(tag, { where: { id } });
-        return new ResponseDTO("Tag Updated.");
+            await this.tagRepo.update(tag, { where: { id }, transaction: t });
+            return new ResponseDTO("Tag Updated.");
+        });
+        return transactionResult;
     }
 
     public async deleteTag(id: number): Promise<ResponseDTO> {
-        const existsTag = await this.tagRepo.findOne({ where: { id } });
-        if (!existsTag) {
-            throw new TagError("TAG_NOT_FOUND", "Tag not found");
-        }
-        await this.tagRepo.destroy({ where: { id } });
-        return new ResponseDTO("Tag Deleted.");
+        const transactionResult = await this.sequelize.transaction(async (t) => {
+            const existsTag = await this.tagRepo.findOne({ where: { id }, transaction: t },);
+            if (!existsTag) {
+                throw new TagError("TAG_NOT_FOUND", "Tag not found");
+            }
+            await this.tagRepo.destroy({ where: { id }, transaction: t });
+            return new ResponseDTO("Tag Deleted.");
+        });
+        return transactionResult;
     }
 
 }
