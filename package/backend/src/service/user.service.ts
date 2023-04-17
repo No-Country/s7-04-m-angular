@@ -85,7 +85,7 @@ export class UserService {
 
 
   public async getMe(id: number): Promise<User> {
-    const existsUser = await this.userRepository.findOne({ where: { id } });
+    const existsUser = await this.userRepository.findOne({ where: { id }, include:[this.roleRepository]}  );
     if (!existsUser) {
       throw new UserError("USER_NOT_FOUND", "User not found");
     }

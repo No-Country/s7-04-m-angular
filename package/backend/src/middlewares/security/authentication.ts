@@ -39,5 +39,7 @@ export function expressAuthentication(
       });
     }
 
+    
+
     return Promise.reject(new Error("Unknown security name"));
   }

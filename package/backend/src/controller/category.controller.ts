@@ -10,7 +10,7 @@ import { ResponseDTO } from "../dto/general/response.dto";
 
 
 @Tags("Category")
-@Route("/api/v1/category")
+@Route("/api/v1/categories")
 export class CategoryController extends Controller {
 
     private readonly service : CategoryService;
