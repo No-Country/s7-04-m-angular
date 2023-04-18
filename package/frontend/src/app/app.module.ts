@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MaterialModule } from './modules/material/material.module';
@@ -20,6 +20,8 @@ import { ForumBarComponent } from './components/forum-bar/forum-bar.component';
 import { TitleComponent } from './components/title/title.component';
 import { SectionComponent } from './components/section/section.component';
 import { LogoComponent } from './components/logo/logo.component';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { ThreadsComponent } from './views/threads/threads.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,7 @@ import { LogoComponent } from './components/logo/logo.component';
     TitleComponent,
     SectionComponent,
     LogoComponent,
+    ThreadsComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +49,9 @@ import { LogoComponent } from './components/logo/logo.component';
     ReactiveFormsModule,
     MaterialModule,
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

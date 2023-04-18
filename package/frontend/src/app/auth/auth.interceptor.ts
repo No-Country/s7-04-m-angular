@@ -13,11 +13,11 @@ export class AuthInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const idToken = localStorage.getItem('id_token');
+    const token = localStorage.getItem('token');
 
-    if (idToken) {
+    if (token) {
       const cloned = req.clone({
-        headers: req.headers.set('Authorization', 'Bearer ' + idToken),
+        headers: req.headers.set('Authorization', 'Bearer ' + token),
       });
 
       return next.handle(cloned);
@@ -25,4 +25,5 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
   }
+  
 }

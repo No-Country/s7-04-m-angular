@@ -1,16 +1,15 @@
 <div class="user-profile">
   <div class="profile-header">
-    <img
-      src="../../../assets/images/profile.png"
-      alt="Profile Image"
-      class="profile-image"
-    />
-    <h2 class="profile-name">Nombre de Usuario</h2>
-    <p class="profile-email">correo@electronico.com</p>
-    <p class="profile-time">Usuario desde hace X tiempo</p>
+    <img [src]="user.image" alt="Profile Image" class="profile-image" />
+    <h2 class="profile-name">
+      Hola! <span>{{ user.nickname }}</span>
+    </h2>
+    <p class="profile-email">{{ user.email }}</p>
   </div>
   <div class="profile-actions">
-    <button class="btn-logout">Cerrar sesión</button>
+    <button  (click)="logout()" class="btn-logout">Cerrar sesión</button>
     <button class="btn-delete">Eliminar cuenta</button>
   </div>
 </div>
+
+
