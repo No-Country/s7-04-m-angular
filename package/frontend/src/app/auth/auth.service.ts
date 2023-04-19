@@ -24,8 +24,10 @@ export class AuthService {
       .pipe(
         tap((res) => {
           const authResult = {
+            id: res.id,
             expiresIn: res.expiresIn,
-            token: res.token.toString(), // Utilizar jwt_decode en lugar de JwtHelperService
+            token: res.token.toString(),
+             // Utilizar jwt_decode en lugar de JwtHelperService
           };
           this.setSession(authResult);
           this.router.navigate(['/home']);
@@ -34,17 +36,20 @@ export class AuthService {
       );
   }
 
-  private setSession(authResult: { expiresIn: number; token: string }) {
+  private setSession(authResult: { expiresIn: number; token: string,id:number }) {
     const expiresAt = moment().add(authResult.expiresIn, 'second');
 
     localStorage.setItem('token', authResult.token);
     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-  }
+    
+  localStorage.setItem('user_id', authResult.id.toString());
+}
 
   
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('expires_at');
+    localStorage.removeItem('user_id');
   }
 
  isLoggedIn(): boolean {
