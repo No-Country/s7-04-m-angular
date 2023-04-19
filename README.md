@@ -56,6 +56,7 @@
 <img src="https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white" />
 <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" />
 <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=Sequelize&logoColor=white" />
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white" />
 </div>
 
 | [<img src="https://github.com/thadek.png?size=115" width="115">](https://github.com/thadek)<br><h3>Gabriel Pamich</h3><a href="https://www.linkedin.com/in/gpamic/" rel="nofollow"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="https://www.linkedin.com/in/gpamic/" height="20" width="20" style="max-width: 100%;"></a>&nbsp;<a href="https://github.com/thadek" rel="nofollow"><img align="center" src="https://animejs.com/documentation/assets/img/icons/icon-github.svg"  height="30" width="30" style="max-width: 100%;"></a> |
