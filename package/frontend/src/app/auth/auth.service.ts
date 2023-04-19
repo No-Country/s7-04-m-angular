@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  url: string = 'http://s7-04-backend-dev.us-east-1.elasticbeanstalk.com/';
+  url: string = 'https://s7-04-backend.joardev.co/';
   secret: string = 'mysecret';
   jwtHelper: JwtHelperService = new JwtHelperService(); // Crear instancia de JwtHelperService
   token: string ='';

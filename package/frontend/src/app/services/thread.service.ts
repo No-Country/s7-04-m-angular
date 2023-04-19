@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ThreadService {
-  private apiUrl = 'http://s7-04-backend-dev.us-east-1.elasticbeanstalk.com/api/v1/threads';
+  private apiUrl = 'https://s7-04-backend.joardev.co/api/v1/threads';
 
   constructor(private http: HttpClient) { }
 
