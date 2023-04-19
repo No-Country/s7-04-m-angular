@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
   private url =
-    'http://s7-04-backend-dev.us-east-1.elasticbeanstalk.com/api/v1/auth/me';
+    'https://s7-04-backend.joardev.co/api/v1/auth/me';
 
   constructor(private http: HttpClient) {}
   getUsers(): Observable<any> {
