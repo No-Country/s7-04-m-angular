@@ -16,6 +16,7 @@ import { ResponseDTO } from "../dto/general/response.dto";
 import { UpdateUserDTO } from "../dto/user/update.user.dto";
 import { Op } from "sequelize";
 import { CreateUserDTO } from "../dto/user/create.user.dto";
+import { UpdateMeDTO } from "../dto/user/updateMe.dto";
 
 export class UserService {
   private readonly userRepository: Repository<User>;
@@ -90,6 +91,9 @@ export class UserService {
 
 
 
+
+  
+
   public async getMe(id: number): Promise<User> {
     const existsUser = await this.userRepository.findOne({ where: { id }, include: [this.roleRepository] });
     if (!existsUser) {
@@ -97,6 +101,30 @@ export class UserService {
     }
     return existsUser;
   }
+
+
+
+  public async updateMe(id: number, user: UpdateMeDTO): Promise<User> {
+
+    const transactionResult = await this.sequelize.transaction(async (t) => {
+
+      const existsUser = await this.userRepository.findOne({ where: { id }, transaction: t });
+      if (!existsUser) {
+        throw new UserError("USER_NOT_FOUND", "User not found");
+      }
+
+      if(user.password){
+        user.password = await hashPassword(user.password);
+      }
+
+      const updatedUser = await existsUser.update(user, { transaction: t });
+
+      return updatedUser;
+
+    });
+    return transactionResult;
+  }
+
 
 
   /**

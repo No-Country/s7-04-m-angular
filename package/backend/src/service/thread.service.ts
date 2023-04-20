@@ -15,8 +15,9 @@ import { TagError } from "../error/Tag.error";
 import { ThreadUpdateDTO } from "../dto/thread/Request/thread.update.dto";
 import { IUserRequest } from "../Types/IUserRequest";
 import { Role } from "../db/models/role.model";
-import { Includeable } from "sequelize";
+import { Includeable, Op, QueryTypes } from "sequelize";
 import { IFilterOptions } from "../Types/IFilterOptions";
+import { ThreadPaginatedDTO } from "../dto/thread/thread.paginated.dto";
 
 
 
@@ -80,6 +81,16 @@ export class ThreadService {
         }
         return thread;
     }
+
+
+    public async findByQuery(query: string, page = 1, limit = 10): Promise<IPaginated<Thread>> {
+        
+        const q = `%${query}%`;
+        //const threads = this.sequelize.query(`SELECT id,title,content,userId,categoryId,createdAt,updatedAt FROM Threads WHERE title LIKE ${sanitizedQuery} OR content LIKE ${sanitizedQuery}`, {replacements:[sanitizedQuery, sanitizedQuery], type: QueryTypes.SELECT });
+       const threads = await this.paginator.paginate({ where: {[Op.or]:[{ title: { [Op.like]: q } },{content:{[Op.like]:q}}]}, include: [this.tagRepo, { model: this.userRepo, include: [this.roleRepo] }, this.categoryRepo] }, page, limit);
+        return threads;
+    }
+
 
 
     private setFilters(options: IFilterOptions): Includeable[] {
