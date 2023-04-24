@@ -2,7 +2,7 @@
     <image src="./readme-images/Logo.png">
 </p>
 
-<h4 align="center"> "Los del fondo" es una web app que funciona para la busqueda de articulos libros, revistas, autor, videos explicativos, sobre materias y temas particulares de estudios, donde los estudiantes puedan consultar  y recibir ayuda de otros alumnos </h4>
+<h4 align="center"> "Los del fondo" es una web app que funciona para la búsqueda de artículos libros, revistas, autor, videos explicativos, sobre materias y temas particulares de estudios, donde los estudiantes puedan consultar  y recibir ayuda de otros alumnos</h4>
 
 # Team
 
@@ -11,6 +11,8 @@
 <div align="center">
 <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white" />
 </div>
+
+### Tareas 📋 ✔
 
 - Conceptualización del proyecto
 - Maquetación del design system 
@@ -30,6 +32,8 @@
 <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
 <img src="https://img.shields.io/badge/Lerna-3E3E3E?style=for-the-badge&logo=lerna&logoColor=white" />
 </div>
+
+### Tareas 📋 ✔
 
 - Administrar mono repositorio usando Lerna
 - Estandarizar los mensajes de commit con Commitlint y Husky
@@ -67,6 +71,8 @@
 | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 
 ## Backend
+
+### Tareas 📋 ✔
 
 1) Base de Datos:
   - Modelado de BD relacional MySQL ( MER->MR->BD)
