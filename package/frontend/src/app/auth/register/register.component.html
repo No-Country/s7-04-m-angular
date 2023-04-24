@@ -1,35 +1,38 @@
 <div class="wrapper">
   <div class="body">
-    <form>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
       <div>
-        <h1>Register</h1>
+        <h1>Registro</h1>
       </div>
       <div>
+        <label for="nickname">Nombre de usuario</label>
         <input
           type="text"
+          id="nickname"
           class="form-control"
-          placeholder="Ingrese nombre de usuario"
-          formControlName="username"
+          placeholder="nickname123"
+          formControlName="nickname"
         />
-        <label>Nombre de usuario</label>
       </div>
       <div>
+        <label for="email">Correo electrónico</label>
         <input
           type="email"
+          id="email"
           class="form-control"
-          placeholder="Ingrese correo electrónico"
+          placeholder="juan@ejemplo.com"
           formControlName="email"
         />
-        <label>Correo electrónico</label>
       </div>
       <div>
+        <label for="password">Contraseña</label>
         <input
-          type="password"
+          type="text"
+          id="password"
           class="form-control"
           placeholder="Ingrese contraseña"
           formControlName="password"
         />
-        <label>Contraseña</label>
       </div>
 
       <div>

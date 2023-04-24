@@ -14,7 +14,7 @@ export class AuthService {
   url: string = 'http://s7-04-backend-dev.us-east-1.elasticbeanstalk.com/';
   secret: string = 'mysecret';
   jwtHelper: JwtHelperService = new JwtHelperService(); // Crear instancia de JwtHelperService
-  token: string ='';
+  token: string = '';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -27,7 +27,7 @@ export class AuthService {
             id: res.id,
             expiresIn: res.expiresIn,
             token: res.token.toString(),
-             // Utilizar jwt_decode en lugar de JwtHelperService
+            // Utilizar jwt_decode en lugar de JwtHelperService
           };
           this.setSession(authResult);
           this.router.navigate(['/home']);
@@ -36,26 +36,41 @@ export class AuthService {
       );
   }
 
-  private setSession(authResult: { expiresIn: number; token: string,id:number }) {
+  private setSession(authResult: {
+    expiresIn: number;
+    token: string;
+    id: number;
+  }) {
     const expiresAt = moment().add(authResult.expiresIn, 'second');
-
+    3;
     localStorage.setItem('token', authResult.token);
     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-    
-  localStorage.setItem('user_id', authResult.id.toString());
-}
 
-  
+    localStorage.setItem('user_id', authResult.id.toString());
+  }
+  register(
+    nickname: string,
+    email: string,
+    password: string
+  ): Observable<User> {
+    return this.http.post<User>(this.url + 'api/v1/register', {
+      nickname,
+      email,
+      password,
+    });
+    console.log();
+  }
+
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('user_id');
   }
 
- isLoggedIn(): boolean {
-  const token = localStorage.getItem('token'); // Corregir el uso de la variable token
-  return token !== null; // Devolver true si el token existe, false en caso contrario
-}
+  isLoggedIn(): boolean {
+    const token = localStorage.getItem('token'); // Corregir el uso de la variable token
+    return token !== null; // Devolver true si el token existe, false en caso contrario
+  }
 
   isLoggedOut() {
     return !this.isLoggedIn();
