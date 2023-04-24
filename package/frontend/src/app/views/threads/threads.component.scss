@@ -1,0 +1,29 @@
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  li {
+    
+  margin-bottom: 10px;
+  padding: 10px;  
+  max-height: 200px;
+  overflow: hidden;
+  box-sizing: border-box;
+  }
+  
+  
+  .question {
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    width: 33.33%;
+    margin: 0 auto;
+  }
+  
+  .answer {
+    margin-top: 10px;
+  }
+  

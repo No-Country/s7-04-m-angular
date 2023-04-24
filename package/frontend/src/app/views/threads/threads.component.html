@@ -1,0 +1,14 @@
+<ul>
+    <li *ngFor="let thread of threads">
+      <div class="question">
+        <h4>{{ thread.title }}</h4>
+        <p>{{ thread.content }}</p>
+        <p>Categoría: {{ thread.category.name }}</p>
+        <p>Usuario: {{ thread.user.nickname }}</p>
+        <p>Tags: {{ thread.tags.join(', ') }}</p>
+      </div>
+      <div class="answer">
+        <p>{{ thread.answer }}</p>
+      </div>
+    </li>
+  </ul>
