@@ -1,0 +1,14 @@
+/* You can add global styles to this file, and also import other style files */
+/* Importar fuente Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* Establecer la fuente predeterminada en todo el proyecto */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #efefef;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
